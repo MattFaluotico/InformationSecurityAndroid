@@ -4,5 +4,8 @@
     <string name="app_name">StrangerDanger</string>
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
+    <string name="title_activity_info">InfoActivity</string>
+    <string name="info2">Enter in 5 In-Case-of-Emergency (ICE) Contacts information</string>
+    <string name="info1">Welcome to StrangerDanger. Let\'s get started...</string>
 
 </resources>
