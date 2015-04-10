@@ -10,7 +10,7 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="0.7"
+        android:layout_weight="0.6"
         android:padding="20dp">
 
         <TextView
@@ -28,7 +28,7 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="0.2">
+        android:layout_weight="0.3">
 
         <LinearLayout
             xmlns:android="http://schemas.android.com/apk/res/android"
@@ -59,6 +59,15 @@
                     android:id="@+id/phone_label"
                     android:layout_below="@+id/name_label"
                     android:layout_marginTop="15dp"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:text="Email:"
+                    android:id="@+id/email_label"
+                    android:layout_below="@+id/phone_label"
+                    android:layout_marginTop="15dp"/>
             </RelativeLayout>
 
             <RelativeLayout
@@ -78,6 +87,14 @@
                     android:ems="10"
                     android:inputType="phone"
                     android:layout_below="@+id/name_text"/>
+
+                <EditText
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/email_text"
+                    android:ems="10"
+                    android:inputType="textEmailAddress"
+                    android:layout_below="@+id/phone_text"/>
             </RelativeLayout>
         </LinearLayout>
     </RelativeLayout>
