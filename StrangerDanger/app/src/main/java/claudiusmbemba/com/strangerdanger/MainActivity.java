@@ -167,9 +167,9 @@ public class MainActivity extends ActionBarActivity {
         mNavItems.add(new NavItem("Home", "Notify ICEs", R.drawable.home));
         mNavItems.add(new NavItem("Edit ICE Contacts", "Edit your ICE Contacts", R.drawable.contact));
         mNavItems.add(new NavItem("Camera", "Take photo evidence", R.drawable.camera));
-        mNavItems.add(new NavItem("Preferences", "Change your app preferences", R.drawable.settings));
+        mNavItems.add(new NavItem("Preferences", "Change your preferences", R.drawable.settings));
         mNavItems.add(new NavItem("About", "About this app", R.drawable.menu));
-        mNavItems.add(new NavItem("Logout", "Sign out of app", R.drawable.logout));
+        mNavItems.add(new NavItem("Logout", "Sign out", R.drawable.logout));
 
         // DrawerLayout
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawerLayout);
@@ -307,8 +307,13 @@ public class MainActivity extends ActionBarActivity {
         // Handle your other action bar items...
         //noinspection SimplifiableIfStatement
         int id = item.getItemId();
+
+//        Menu menu = (Menu) item.getMenuInfo();
         if (id == R.id.action_settings) {
             return true;
+//            boolean drawerOpen = mDrawerLayout.isDrawerOpen(mDrawerPane);
+//            menu.findItem(R.id.action_settings).setVisible(!drawerOpen);
+//            return super.onPrepareOptionsMenu(menu);
         }
 
         return super.onOptionsItemSelected(item);
