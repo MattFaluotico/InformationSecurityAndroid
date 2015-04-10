@@ -164,11 +164,12 @@ public class MainActivity extends ActionBarActivity {
         // More info: http://codetheory.in/difference-between-setdisplayhomeasupenabled-sethomebuttonenabled-and-setdisplayshowhomeenabled/
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        mNavItems.add(new NavItem("Home", "", R.drawable.menu));
-        mNavItems.add(new NavItem("Edit ICE Contacts", "Edit your ICE Contacts", R.drawable.menu));
+        mNavItems.add(new NavItem("Home", "Notify ICEs", R.drawable.home));
+        mNavItems.add(new NavItem("Edit ICE Contacts", "Edit your ICE Contacts", R.drawable.contact));
         mNavItems.add(new NavItem("Camera", "Take photo evidence", R.drawable.camera));
-        mNavItems.add(new NavItem("Preferences", "Change your app preferences", R.drawable.menu));
+        mNavItems.add(new NavItem("Preferences", "Change your app preferences", R.drawable.settings));
         mNavItems.add(new NavItem("About", "About this app", R.drawable.menu));
+        mNavItems.add(new NavItem("Logout", "Sign out of app", R.drawable.logout));
 
         // DrawerLayout
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawerLayout);
@@ -241,15 +242,21 @@ public class MainActivity extends ActionBarActivity {
                 break;
             case "Camera": //intent call to camera
                 //camera: create Intent to take a picture and return control to the calling application
-                Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                Intent camera_intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
                 fileUri = Uri.fromFile(getOutputPhotoFile());// create a file to save the image
                 // fileUri = getOutputMediaFileUri(MEDIA_TYPE_IMAGE);
-                intent.putExtra(MediaStore.EXTRA_OUTPUT, fileUri); // set the image file name
+                camera_intent.putExtra(MediaStore.EXTRA_OUTPUT, fileUri); // set the image file name
                 // start the image capture Intent
-                startActivityForResult(intent, CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE);
+                startActivityForResult(camera_intent, CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE);
                 break;
             case "Edit ICE Contacts":
                 fragment = new AddContactFragment();
+                break;
+            case "Logout":
+                Intent logout_intent = new Intent(Intent.ACTION_MAIN);
+                logout_intent.addCategory(Intent.CATEGORY_HOME);
+                logout_intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(logout_intent);
                 break;
             default:
 
