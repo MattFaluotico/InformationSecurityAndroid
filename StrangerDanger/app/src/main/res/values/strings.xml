@@ -7,5 +7,11 @@
     <string name="title_activity_info">InfoActivity</string>
     <string name="info2">Enter in 5 In-Case-of-Emergency (ICE) Contacts information</string>
     <string name="info1">Welcome to StrangerDanger. Let\'s get started...</string>
+    <string name="drawer_open">Open</string>
+    <string name="drawer_close">Close</string>
+    <string name="about">StrangerDanger is an application created to help faciliate safety everywhere.
+        Built by 6 OSU CSE students, the app allows individuals to quickly and easily notify loved-ones if they are in
+    trouble. With a simple button click or rapid shake, all your ICE contacts will be notified that you fear danger as wel as your exact location.</string>
+
 
 </resources>
