@@ -3,7 +3,11 @@ package claudiusmbemba.com.strangerdanger;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
+import android.provider.MediaStore;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -19,8 +23,12 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import java.io.File;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Locale;
 
 
 public class MainActivity extends ActionBarActivity {
@@ -94,6 +102,59 @@ public class MainActivity extends ActionBarActivity {
     private DrawerLayout mDrawerLayout;
 
     ArrayList<NavItem> mNavItems = new ArrayList<NavItem>();
+
+    //camera intents
+    private static final int CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE = 100;
+    private Uri fileUri;
+
+    private File getOutputPhotoFile() {
+        File directory = new File(Environment.getExternalStoragePublicDirectory(
+                Environment.DIRECTORY_PICTURES), getPackageName());
+        if (!directory.exists()) {
+            if (!directory.mkdirs()) {
+                Log.e(TAG, "Failed to create storage directory.");
+                return null;
+            }
+        }
+        String timeStamp = new SimpleDateFormat("yyyMMdd_HHmmss", Locale.US).format(new java.util.Date());
+        return new File(directory.getPath() + File.separator + "IMG_"
+                + timeStamp + ".jpg");
+    }
+
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE) {
+            if (resultCode == RESULT_OK) {
+                Uri photoUri = null;
+                if (data == null) {
+                    // A known bug here! The image should have saved in fileUri
+                    Toast.makeText(this, "Image saved successfully",
+                            Toast.LENGTH_LONG).show();
+                    photoUri = fileUri;
+                } else {
+                    photoUri = data.getData();
+                    Toast.makeText(this, "Image saved successfully in: " + data.getData(),
+                            Toast.LENGTH_LONG).show();
+                }
+                //showPhoto(photoUri);
+            } else if (resultCode == RESULT_CANCELED) {
+                Toast.makeText(this, "Cancelled", Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(this, "Callout for image capture failed!",
+                        Toast.LENGTH_LONG).show();
+            }
+        }
+    }
+
+//    private void showPhoto(Uri photoUri) {
+//        File imageFile = new File(photoUri);
+//        if (imageFile.exists()){
+//            Bitmap bitmap = BitmapFactory.decodeFile(imageFile.getAbsolutePath());
+//            BitmapDrawable drawable = new BitmapDrawable(this.getResources(), bitmap);
+//            photoImage.setScaleType(ImageView.ScaleType.FIT_CENTER);
+//            photoImage.setImageDrawable(drawable);
+//        }
+//    }
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -178,8 +239,14 @@ public class MainActivity extends ActionBarActivity {
             case "Preferences":
                 fragment = new PreferencesFragment();
                 break;
-            case "Camera":
-                //intent call to camera
+            case "Camera": //intent call to camera
+                //camera: create Intent to take a picture and return control to the calling application
+                Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                fileUri = Uri.fromFile(getOutputPhotoFile());// create a file to save the image
+                // fileUri = getOutputMediaFileUri(MEDIA_TYPE_IMAGE);
+                intent.putExtra(MediaStore.EXTRA_OUTPUT, fileUri); // set the image file name
+                // start the image capture Intent
+                startActivityForResult(intent, CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE);
                 break;
             case "Edit ICE Contacts":
                 fragment = new AddContactFragment();
@@ -188,16 +255,18 @@ public class MainActivity extends ActionBarActivity {
 
         }
 
-        fragmentManager.beginTransaction()
-                .replace(R.id.mainContent, fragment)
-                .commit();
-        mDrawerList.setItemChecked(position, true);
-        setTitle(mNavItems.get(position).mTitle);
-
+        if(fragment != null) {
+            fragmentManager.beginTransaction()
+                    .replace(R.id.mainContent, fragment)
+                    .commit();
+            mDrawerList.setItemChecked(position, true);
+            setTitle(mNavItems.get(position).mTitle);
+        }
 
         // Close the drawer
         mDrawerLayout.closeDrawer(mDrawerPane);
     }
+
 
     // Called when invalidateOptionsMenu() is invoked
     public boolean onPrepareOptionsMenu(Menu menu) {
