@@ -112,4 +112,19 @@ public class AddContactFragment extends Fragment implements View.OnClickListener
 
         prefEditor.commit();
     }
+    
+        public void setContactOnScreen() {
+        contacts = (TextView) getActivity().findViewById(R.id.contacts_view);
+
+        Context context = getActivity();
+        SharedPreferences share = context.getSharedPreferences(STORETEXT, context.MODE_WORLD_READABLE);
+        EditText nameRedo = (EditText) getActivity().findViewById(R.id.name_text);
+        int str = share.getInt(nameRedo.toString(), 0);
+
+        //String key = findKey(share, str);
+
+//        contacts.setText(share);
+//        contacts.setText(nameRedo.toString() + "\n" + Integer.toString(str));
+
+    }
 }
