@@ -80,13 +80,13 @@ public class AddContactFragment extends Fragment implements View.OnClickListener
             if(TextUtils.isEmpty(phone.getText().toString()) && TextUtils.isEmpty(email.getText().toString())){
                 Toast.makeText(this.getActivity(), "Please add either phone # or email", Toast.LENGTH_SHORT).show();
             }else{
-                if(TextUtils.isEmpty(phone.getText().toString())){
-                    contacts.setText(contacts.getText().toString()+"\n" + name.getText().toString() + "\n" + email.getText().toString()+ "\n");
-                }else if(TextUtils.isEmpty(email.getText().toString())){
-                    contacts.setText(contacts.getText().toString()+"\n" + name.getText().toString() + "\n" + phone.getText().toString() + "\n");
-                }else{
-                    contacts.setText(contacts.getText().toString()+"\n" + name.getText().toString() + "\n" + phone.getText().toString()+ "\n" + email.getText().toString() + "\n");
-                }
+//                if(TextUtils.isEmpty(phone.getText().toString())){
+//                    contacts.setText(contacts.getText().toString()+"\n" + name.getText().toString() + "\n" + email.getText().toString()+ "\n");
+//                }else if(TextUtils.isEmpty(email.getText().toString())){
+//                    contacts.setText(contacts.getText().toString()+"\n" + name.getText().toString() + "\n" + phone.getText().toString() + "\n");
+//                }else{
+//                    contacts.setText(contacts.getText().toString()+"\n" + name.getText().toString() + "\n" + phone.getText().toString()+ "\n" + email.getText().toString() + "\n");
+//                }
                 name.clearComposingText();
                 phone.setText("");
                 email.setText("");
@@ -95,5 +95,21 @@ public class AddContactFragment extends Fragment implements View.OnClickListener
         }else{
             Toast.makeText(this.getActivity(), "Please add a contact before saving", Toast.LENGTH_SHORT).show();
         }
+        
+        saveContact()
+    }
+    
+        public void saveContact() {
+        Context context = getActivity();
+        SharedPreferences sharedPref = context.getSharedPreferences(STORETEXT, Context.MODE_PRIVATE);
+        SharedPreferences.Editor prefEditor = sharedPref.edit();
+
+        //int num = getActivity().findViewById(R.id.phone_text).toInt()
+
+        String nameRedo =  getActivity().findViewById(R.id.name_text).toString();
+
+        prefEditor.putInt(nameRedo , 0);
+
+        prefEditor.commit();
     }
 }
