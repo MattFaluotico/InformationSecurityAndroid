@@ -240,6 +240,9 @@ public class MainActivity extends ActionBarActivity {
             case "Preferences":
                 fragment = new PreferencesFragment();
                 break;
+            case "Police Map":
+                fragment = new PoliceMapFragment();
+                break;
             case "Camera": //intent call to camera
                 //camera: create Intent to take a picture and return control to the calling application
                 Intent camera_intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
