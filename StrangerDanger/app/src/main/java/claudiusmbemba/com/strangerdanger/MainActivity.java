@@ -25,17 +25,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import org.apache.http.HttpResponse;
-import org.apache.http.HttpStatus;
-import org.apache.http.StatusLine;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.DefaultHttpClient;
-
-import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.IOException;
-import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Locale;
@@ -294,32 +284,32 @@ public class MainActivity extends ActionBarActivity {
         //activty indicator
 
         //make async call
-        HttpClient httpclient = new DefaultHttpClient();
-        HttpResponse response = httpclient.execute(new HttpGet(""));
-        StatusLine statusLine = response.getStatusLine();
-        if(statusLine.getStatusCode() == HttpStatus.SC_OK){
-            ByteArrayOutputStream out = new ByteArrayOutputStream();
-            try {
-                response.getEntity().writeTo(out);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            String responseString = out.toString();
-            out.close();
-            //..more logic
-        } else{
-            //Closes the connection.
-            try {
-                response.getEntity().getContent().close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            try {
-                throw new IOException(statusLine.getReasonPhrase());
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
+//        HttpClient httpclient = new DefaultHttpClient();
+//        HttpResponse response = httpclient.execute(new HttpGet(""));
+//        StatusLine statusLine = response.getStatusLine();
+//        if(statusLine.getStatusCode() == HttpStatus.SC_OK){
+//            ByteArrayOutputStream out = new ByteArrayOutputStream();
+//            try {
+//                response.getEntity().writeTo(out);
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
+//            String responseString = out.toString();
+//            out.close();
+//            //..more logic
+//        } else{
+//            //Closes the connection.
+//            try {
+//                response.getEntity().getContent().close();
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
+//            try {
+//                throw new IOException(statusLine.getReasonPhrase());
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
+//        }
 
         //push intent
     }

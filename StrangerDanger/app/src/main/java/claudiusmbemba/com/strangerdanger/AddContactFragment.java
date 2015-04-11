@@ -1,6 +1,8 @@
 package claudiusmbemba.com.strangerdanger;
 
 import android.app.Fragment;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
@@ -96,7 +98,7 @@ public class AddContactFragment extends Fragment implements View.OnClickListener
             Toast.makeText(this.getActivity(), "Please add a contact before saving", Toast.LENGTH_SHORT).show();
         }
         
-        saveContact()
+        saveContact();
     }
     
         public void saveContact() {
