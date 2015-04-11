@@ -100,6 +100,7 @@ public class MainActivity extends ActionBarActivity {
     RelativeLayout mDrawerPane;
     private ActionBarDrawerToggle mDrawerToggle;
     private DrawerLayout mDrawerLayout;
+    private Fragment fragment = null;
 
     ArrayList<NavItem> mNavItems = new ArrayList<NavItem>();
 
@@ -129,9 +130,9 @@ public class MainActivity extends ActionBarActivity {
                     // A known bug here! The image should have saved in fileUri
                     Toast.makeText(this, "Image saved successfully",
                             Toast.LENGTH_LONG).show();
-                    photoUri = fileUri;
+//                    photoUri = fileUri;
                 } else {
-                    photoUri = data.getData();
+//                    photoUri = data.getData();
                     Toast.makeText(this, "Image saved successfully in: " + data.getData(),
                             Toast.LENGTH_LONG).show();
                 }
@@ -227,7 +228,6 @@ public class MainActivity extends ActionBarActivity {
 
         NavItem item = mNavItems.get(position);
 
-        Fragment fragment = null;
         FragmentManager fragmentManager = getFragmentManager();
 
         switch (item.mTitle) {
@@ -288,6 +288,7 @@ public class MainActivity extends ActionBarActivity {
         super.onPostCreate(savedInstanceState);
         mDrawerToggle.syncState();
     }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
