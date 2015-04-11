@@ -18,14 +18,20 @@
         android:gravity="center"
         android:textColor="#000000"/>
 
-    <ImageButton
+    <Button
+        android:text=""
+        android:textColor="#FF120A"
+        android:textSize="30sp"
         android:layout_width="200dp"
         android:layout_height="200dp"
-        android:src="@drawable/danger"
+        android:background="@drawable/buttonshape"
+        android:shadowColor="#A81403"
+        android:shadowDx="0"
+        android:shadowDy="0"
+        android:shadowRadius="5"
         android:layout_centerInParent="true"
         android:layout_centerVertical="true"
         android:layout_centerHorizontal="true"
-        android:id="@+id/danger_button"
-        android:onClick=""/>
+        android:id="@+id/danger_button"/>
 
 </RelativeLayout>

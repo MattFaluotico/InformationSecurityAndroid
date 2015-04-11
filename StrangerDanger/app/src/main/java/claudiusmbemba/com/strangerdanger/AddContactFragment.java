@@ -36,6 +36,8 @@ public class AddContactFragment extends Fragment implements View.OnClickListener
         btn = (Button) view.findViewById(R.id.save_contact);
         btn.setOnClickListener(this);
 
+        name = (EditText) view.findViewById(R.id.name_text);
+        name.requestFocus();
         // Inflate the layout for this fragment
 //        return inflater.inflate(R.layout.fragment_add, container, false);
         return view;
@@ -85,7 +87,9 @@ public class AddContactFragment extends Fragment implements View.OnClickListener
                 }else{
                     contacts.setText(contacts.getText().toString()+"\n" + name.getText().toString() + "\n" + phone.getText().toString()+ "\n" + email.getText().toString() + "\n");
                 }
-
+                name.clearComposingText();
+                phone.setText("");
+                email.setText("");
                 Toast.makeText(this.getActivity(), "Contact saved!", Toast.LENGTH_SHORT).show();
             }
         }else{
