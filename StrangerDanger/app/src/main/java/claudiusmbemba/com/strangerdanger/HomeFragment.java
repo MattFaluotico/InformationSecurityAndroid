@@ -218,8 +218,8 @@ public class HomeFragment extends Fragment implements
     @Override
     public void onLocationChanged(Location location) {
         currentLocation = location;
-        String msg = "Update location: " + Double.toHexString(location.getLatitude()) + ", " + Double.toString(location.getLongitude());
-        Toast.makeText(this.getActivity(), msg, Toast.LENGTH_LONG).show();
+        String msg = "Update location: " + Double.toString(location.getLatitude()) + ", " + Double.toString(location.getLongitude());
+//        Toast.makeText(this.getActivity(), msg, Toast.LENGTH_LONG).show();
         lastLocation = location;
     }
 

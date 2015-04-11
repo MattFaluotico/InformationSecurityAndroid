@@ -25,7 +25,17 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.apache.http.HttpResponse;
+import org.apache.http.HttpStatus;
+import org.apache.http.StatusLine;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.DefaultHttpClient;
+
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.IOException;
+import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Locale;
@@ -167,6 +177,7 @@ public class MainActivity extends ActionBarActivity {
 
         mNavItems.add(new NavItem("Home", "Notify ICEs", R.drawable.home));
         mNavItems.add(new NavItem("Edit ICE Contacts", "Edit your ICE Contacts", R.drawable.contact));
+        mNavItems.add(new NavItem("Police", "Contact nearest police", R.drawable.police));
         mNavItems.add(new NavItem("Camera", "Take photo evidence", R.drawable.camera));
         mNavItems.add(new NavItem("Preferences", "Change your preferences", R.drawable.settings));
         mNavItems.add(new NavItem("About", "About this app", R.drawable.menu));
@@ -240,8 +251,9 @@ public class MainActivity extends ActionBarActivity {
             case "Preferences":
                 fragment = new PreferencesFragment();
                 break;
-            case "Police Map":
-                fragment = new PoliceMapFragment();
+            case "Police":
+                //call Google place API
+                getNearByPolice();
                 break;
             case "Camera": //intent call to camera
                 //camera: create Intent to take a picture and return control to the calling application
@@ -275,6 +287,41 @@ public class MainActivity extends ActionBarActivity {
 
         // Close the drawer
         mDrawerLayout.closeDrawer(mDrawerPane);
+    }
+
+    private void getNearByPolice() {
+
+        //activty indicator
+
+        //make async call
+        HttpClient httpclient = new DefaultHttpClient();
+        HttpResponse response = httpclient.execute(new HttpGet(""));
+        StatusLine statusLine = response.getStatusLine();
+        if(statusLine.getStatusCode() == HttpStatus.SC_OK){
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            try {
+                response.getEntity().writeTo(out);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            String responseString = out.toString();
+            out.close();
+            //..more logic
+        } else{
+            //Closes the connection.
+            try {
+                response.getEntity().getContent().close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            try {
+                throw new IOException(statusLine.getReasonPhrase());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        //push intent
     }
 
 
