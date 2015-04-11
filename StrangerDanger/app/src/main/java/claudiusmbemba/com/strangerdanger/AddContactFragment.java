@@ -1,6 +1,8 @@
 package claudiusmbemba.com.strangerdanger;
 
 import android.app.Fragment;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
@@ -11,11 +13,13 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.Map;
 /**
  * Created by ClaudiusThaBeast on 4/10/15.
  */
 public class AddContactFragment extends Fragment implements View.OnClickListener {
 
+    private final static String STORETEXT="storetext.txt";
     public AddContactFragment() {
         //empty constructor
     }
@@ -29,6 +33,7 @@ public class AddContactFragment extends Fragment implements View.OnClickListener
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
 
         View view = inflater.inflate(
                 R.layout.fragment_add, container, false);
@@ -38,10 +43,15 @@ public class AddContactFragment extends Fragment implements View.OnClickListener
 
         name = (EditText) view.findViewById(R.id.name_text);
         name.requestFocus();
+
+        Context context = getActivity();
+        SharedPreferences settings = context.getSharedPreferences(STORETEXT, Context.MODE_PRIVATE);
+
         // Inflate the layout for this fragment
 //        return inflater.inflate(R.layout.fragment_add, container, false);
         return view;
     }
+
 
 //    public void save(View view){
 //
@@ -95,11 +105,14 @@ public class AddContactFragment extends Fragment implements View.OnClickListener
         }else{
             Toast.makeText(this.getActivity(), "Please add a contact before saving", Toast.LENGTH_SHORT).show();
         }
-        
-        saveContact()
+
+        saveContact();
+//        Toast.makeText(context.getApplicationContext(), str, Toast.LENGTH_LONG).show();
+ //       setContactOnScreen();
     }
-    
-        public void saveContact() {
+
+
+    public void saveContact() {
         Context context = getActivity();
         SharedPreferences sharedPref = context.getSharedPreferences(STORETEXT, Context.MODE_PRIVATE);
         SharedPreferences.Editor prefEditor = sharedPref.edit();
@@ -112,8 +125,15 @@ public class AddContactFragment extends Fragment implements View.OnClickListener
 
         prefEditor.commit();
     }
-    
-        public void setContactOnScreen() {
+
+//    public static int getContact(Context context) {
+//        SharedPreferences share = context.getSharedPreferences(STORETEXT, context.MODE_WORLD_READABLE);
+//
+//        EditText nameRedo = (EditText) getActivity().findViewById(R.id.name_text);
+//        return share.getInt(nameRedo.toString(), 0);
+//    }
+
+    public void setContactOnScreen() {
         contacts = (TextView) getActivity().findViewById(R.id.contacts_view);
 
         Context context = getActivity();
@@ -127,4 +147,27 @@ public class AddContactFragment extends Fragment implements View.OnClickListener
 //        contacts.setText(nameRedo.toString() + "\n" + Integer.toString(str));
 
     }
+
+//    public String findKey(SharedPreferences share, int value) {
+//        for (Map.Entry<String, ?> entry: share.getAll()) {
+//            if (valiue.equals(entry.getValue())) {
+//                return entry.getKey();
+//            }
+//        }
+//        return null;
+//    }
+
+//    @Override
+//    protected void saveThis (View v) {
+//        super.saveThis();
+//        SharedPreferences storage = getSharedPreferences(STORETEXT, MODE_PRIVATE);
+//        SharedPreferences.Editor storageEditor = storage.edit();
+//
+//        storageEditor.putString("ContactName", "John Doe");
+//        storageEditor.commit();
+//
+//        String str = storage.getString("ContactName", "John Doe");
+//        Toast.makeText(getContext(), str + "", Toast.LENGTH_LONG).show();
+//    }
+
 }
