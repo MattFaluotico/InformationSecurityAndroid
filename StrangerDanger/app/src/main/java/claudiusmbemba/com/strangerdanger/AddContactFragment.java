@@ -31,6 +31,7 @@ public class AddContactFragment extends Fragment implements View.OnClickListener
     String names = null;
     String phones = null;
     String emails = null;
+    String[] allNames = null;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -43,12 +44,17 @@ public class AddContactFragment extends Fragment implements View.OnClickListener
 
         contacts = (TextView) view.findViewById(R.id.contacts_view);
 
+        btn = (Button) view.findViewById(R.id.save_contact);
+        btn.setOnClickListener(this);
+
+        name = (EditText) view.findViewById(R.id.name_text);
+        name.requestFocus();
+
         names = prefs.getString("names", "");
         phones = prefs.getString("phones", "");
         emails = prefs.getString("emails", "");
 
         if(!names.matches("")){
-            String[] allNames = null;
             String[] allPhones = null;
             String[] allEmails = null;
 
@@ -74,13 +80,6 @@ public class AddContactFragment extends Fragment implements View.OnClickListener
             }
 
         }
-
-        btn = (Button) view.findViewById(R.id.save_contact);
-        btn.setOnClickListener(this);
-
-        name = (EditText) view.findViewById(R.id.name_text);
-        name.requestFocus();
-
 
         // Inflate the layout for this fragment
 //        return inflater.inflate(R.layout.fragment_add, container, false);
@@ -110,6 +109,7 @@ public class AddContactFragment extends Fragment implements View.OnClickListener
 
     @Override
     public void onClick(View v) {
+
 //        save(v);
 //        Toast.makeText(this.getActivity(),
 //                "Button is clicked!", Toast.LENGTH_LONG).show();
@@ -124,26 +124,33 @@ public class AddContactFragment extends Fragment implements View.OnClickListener
             if (TextUtils.isEmpty(phone.getText().toString()) || TextUtils.isEmpty(email.getText().toString())) {
                 Toast.makeText(this.getActivity(), "Please add contacts phone # and email", Toast.LENGTH_SHORT).show();
             } else {
+                //save contact to preferences
+                names += (names.matches(""))? name.getText(): ","+name.getText();
+                String[] nameCount = names.split(",");
+
+                if(nameCount.length <= 5){
+                    phones += (phones.matches(""))? phone.getText():","+phone.getText();
+                    emails += (emails.matches(""))? email.getText():","+email.getText();
+
+                    prefs.edit().putString("names", names).putString("phones", phones).putString("emails", emails).commit();
+
 //                if (TextUtils.isEmpty(phone.getText().toString())) {
 //                    contacts.setText(contacts.getText().toString() + "\n" + name.getText().toString() + "\n" + email.getText().toString() + "\n");
 //                } else if (TextUtils.isEmpty(email.getText().toString())) {
 //                    contacts.setText(contacts.getText().toString() + "\n" + name.getText().toString() + "\n" + phone.getText().toString() + "\n");
 //                } else {
-                contacts.setText(contacts.getText().toString() + name.getText().toString() + "\n" + phone.getText().toString() + "\n" + email.getText().toString() + "\n");
+                    contacts.setText(contacts.getText().toString() + name.getText().toString() + "\n" + phone.getText().toString() + "\n" + email.getText().toString() + "\n");
 //                }
 
-                //save contact to preferences
-                names += (names.matches(""))? name.getText(): ","+name.getText();
-                phones += (phones.matches(""))? phone.getText():","+phone.getText();
-                emails += (emails.matches(""))? email.getText():","+email.getText();
+                    name.setText("");
+                    phone.setText("");
+                    email.setText("");
 
-                prefs.edit().putString("names", names).putString("phones", phones).putString("emails", emails).commit();
-
-                name.setText("");
-                phone.setText("");
-                email.setText("");
-
-                Toast.makeText(this.getActivity(), "Contact saved!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this.getActivity(), "Contact saved!", Toast.LENGTH_SHORT).show();
+                }else{
+                    Toast.makeText(this.getActivity(), "Reached max of 5 contacts saved!", Toast.LENGTH_SHORT).show();
+                    btn.setEnabled(false);
+                }
             }
         } else {
             Toast.makeText(this.getActivity(), "Please add a contact before saving", Toast.LENGTH_SHORT).show();
