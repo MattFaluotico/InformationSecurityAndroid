@@ -12,6 +12,7 @@ import android.location.LocationManager;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Handler;
+import android.telephony.SmsManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -242,19 +243,21 @@ public class HomeFragment extends Fragment implements
         lastLocation = location;
     }
 
-    public Double getLat(){
+    public String getLat(){
         if (!manager.isProviderEnabled(LocationManager.GPS_PROVIDER)){
             return null;
         }else{
-            return currentLocation.getLatitude();
+            Double loc = currentLocation.getLatitude();
+            return loc.toString();
         }
     }
 
-    public Double getLng(){
+    public String getLng(){
         if (!manager.isProviderEnabled(LocationManager.GPS_PROVIDER)){
             return null;
         }else {
-            return currentLocation.getLongitude();
+            Double loc = currentLocation.getLongitude();
+            return loc.toString();
         }
     }
 
@@ -345,7 +348,9 @@ public class HomeFragment extends Fragment implements
     @Override
     public void onClick(View v) {
         //api to notify ICEs
-        Toast.makeText(this.getActivity(), "ICEs will be notified!", Toast.LENGTH_LONG).show();
+//        Toast.makeText(this.getActivity(), "ICEs will be notified!", Toast.LENGTH_LONG).show();
+//        notifySMS("7406410248", getLat(), getLng());
+        notifyEmial("mbembac@gmail.com", getLat(), getLng());
 //        Handler myHandler = new Handler();
 //        myHandler.postDelayed(playSound, 3000);
         //delaySiren
@@ -437,6 +442,47 @@ public class HomeFragment extends Fragment implements
 //        }
 //    };
 
+    //SMS related code
+    SmsManager smsManager = SmsManager.getDefault();
+
+    public void notifySMS(String phone, String lat, String lng) {
+        try {
+            SmsManager smsManager = SmsManager.getDefault();
+            smsManager.sendTextMessage(phone, null, "Help! I fear for my life!\n My location is lat:" + lat + ", long:" + lng + "\n-Claudius", null, null);
+            Toast.makeText(context, "SMS Sent!",
+                    Toast.LENGTH_SHORT).show();
+        } catch (Exception e) {
+            Toast.makeText(context,
+                    "SMS failed, please try again later!",
+                    Toast.LENGTH_LONG).show();
+            e.printStackTrace();
+        }
+    }
+
+
+    //EMAIL related code
+    public void notifyEmial(String email, String lat, String lng) {
+
+        try {
+            GMailSender sender = new GMailSender(email, "C0nfirmoceanhornadmin!");
+            sender.sendMail("Help Me!",
+                    "Hey this is Claudius\n I'm currently at lat:"+lat+", long:"+lng+" and I fear for my life." +
+                            "There's a chain wielding maniac so please some get me!",
+                    "mbembac@gmail.com",
+                    "mbembac@gmail.com,Matt.Faluotico@gmail.com,esh.derek@gmail.com,fenton.joshua4@gmail.com,trong.p.le.92@gmail.com,jlasuperman.new52@gmail.com");
+            Toast.makeText(context,
+                    "Emails sent!",
+                    Toast.LENGTH_SHORT).show();
+        } catch (Exception e) {
+            Toast.makeText(context,
+                    "Email failed, please verify email address",
+                    Toast.LENGTH_LONG).show();
+//            Log.e("SendMail", e.getMessage(), e);
+        }
+
+    }
+
+
     // Define a DialogFragment that displays the error dialog
     public static class ErrorDialogFragment extends android.support.v4.app.DialogFragment {
         // Global field to contain the error dialog
@@ -460,4 +506,5 @@ public class HomeFragment extends Fragment implements
         }
 
     }
+
 }

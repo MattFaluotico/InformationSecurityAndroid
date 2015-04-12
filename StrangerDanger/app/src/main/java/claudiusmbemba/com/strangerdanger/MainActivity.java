@@ -314,8 +314,8 @@ public class MainActivity extends ActionBarActivity {
         String lat = null, lng = null;
 
         if(home.checkGPSenabled()){
-            lat = home.getLat().toString();
-            lng = home.getLng().toString();
+            lat = home.getLat();
+            lng = home.getLng();
 //            Log.d("LAT", lat.toString());
 //            Log.d("LONG", lng.toString());
             //push intent
