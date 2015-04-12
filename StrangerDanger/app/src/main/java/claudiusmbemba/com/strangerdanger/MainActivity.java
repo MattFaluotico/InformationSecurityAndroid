@@ -1,10 +1,14 @@
 package claudiusmbemba.com.strangerdanger;
 
+import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.content.Context;
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
@@ -25,7 +29,23 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+<<<<<<< HEAD
 import java.io.File;
+=======
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+>>>>>>> UIwork
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Locale;
@@ -96,11 +116,13 @@ public class MainActivity extends ActionBarActivity {
 
     private static String TAG = MainActivity.class.getSimpleName();
 
+    Context context;
     ListView mDrawerList;
     RelativeLayout mDrawerPane;
     private ActionBarDrawerToggle mDrawerToggle;
     private DrawerLayout mDrawerLayout;
     private Fragment fragment = null;
+    private HomeFragment home;
 
     ArrayList<NavItem> mNavItems = new ArrayList<NavItem>();
 
@@ -165,6 +187,8 @@ public class MainActivity extends ActionBarActivity {
         // More info: http://codetheory.in/difference-between-setdisplayhomeasupenabled-sethomebuttonenabled-and-setdisplayshowhomeenabled/
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
+        context = this;
+
         mNavItems.add(new NavItem("Home", "Notify ICEs", R.drawable.home));
         mNavItems.add(new NavItem("Edit ICE Contacts", "Edit your ICE Contacts", R.drawable.contact));
         mNavItems.add(new NavItem("Police", "Contact nearest police", R.drawable.police));
@@ -211,11 +235,13 @@ public class MainActivity extends ActionBarActivity {
         mDrawerLayout.setDrawerListener(mDrawerToggle);
 
         //set home fragment
-        Fragment fragment = new HomeFragment();
+//        Fragment fragment = new HomeFragment();
+        home = new HomeFragment();
+
         FragmentManager fragmentManager = getFragmentManager();
 
         fragmentManager.beginTransaction()
-                .replace(R.id.mainContent, fragment)
+                .replace(R.id.mainContent, home)
                 .commit();
         setTitle("Home");
 
@@ -284,6 +310,7 @@ public class MainActivity extends ActionBarActivity {
         //activty indicator
 
         //make async call
+<<<<<<< HEAD
 //        HttpClient httpclient = new DefaultHttpClient();
 //        HttpResponse response = httpclient.execute(new HttpGet(""));
 //        StatusLine statusLine = response.getStatusLine();
@@ -310,8 +337,84 @@ public class MainActivity extends ActionBarActivity {
 //                e.printStackTrace();
 //            }
 //        }
+=======
+        // call AsynTask to perform network operation on separate thread
+//        new HttpAsyncTask().execute("https://maps.googleapis.com/maps/api/place/search/json?location=37.785835,-122.406418&rankby=distance&types=police&sensor=false&key=AIzaSyCU7rZMOqBsI87fpoZBSIxQPs0A9yLK6k0");
 
-        //push intent
+        //getLocation
+
+        String lat = null, lng = null;
+
+        if(home.checkGPSenabled()){
+            lat = home.getLat();
+            lng = home.getLng();
+//            Log.d("LAT", lat.toString());
+//            Log.d("LONG", lng.toString());
+            //push intent
+            Uri gmmIntentUri = Uri.parse("geo:"+lat+","+lng+"?q=police");
+
+            // Create an Intent from gmmIntentUri. Set the action to ACTION_VIEW
+            Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
+            // Make the Intent explicit by setting the Google Maps package
+            mapIntent.setPackage("com.google.android.apps.maps");
+
+            // Attempt to start an activity that can handle the Intent
+            startActivity(mapIntent);
+        }else{
+//            Toast.makeText(this, "Could not get location. Please check GPS is on", Toast.LENGTH_LONG).show();
+            home.gpsEnabledNotification();
+        }
+    }
+
+    //HTTP GET CALL
+    public static String GET(String url){
+        InputStream inputStream = null;
+        String result = "";
+        try {
+
+            // create HttpClient
+            HttpClient httpclient = new DefaultHttpClient();
+
+            // make GET request to the given URL
+            HttpResponse httpResponse = httpclient.execute(new HttpGet(url));
+
+            // receive response as inputStream
+            inputStream = httpResponse.getEntity().getContent();
+
+            // convert inputstream to string
+            if(inputStream != null)
+                result = convertInputStreamToString(inputStream);
+            else
+                result = "Did not work!";
+>>>>>>> UIwork
+
+        } catch (Exception e) {
+            Log.d("InputStream", e.getLocalizedMessage());
+        }
+
+        return result;
+    }
+
+    private static String convertInputStreamToString(InputStream inputStream) throws IOException {
+        BufferedReader bufferedReader = new BufferedReader( new InputStreamReader(inputStream));
+        String line = "";
+        String result = "";
+        while((line = bufferedReader.readLine()) != null)
+            result += line;
+
+        inputStream.close();
+        return result;
+
+    }
+
+    public boolean isConnected(){
+        ConnectivityManager connMgr = (ConnectivityManager) getSystemService(Activity.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
+        if (networkInfo != null && networkInfo.isConnected()) {
+            return true;
+        }else {
+            return false;
+        }
     }
 
 
@@ -359,5 +462,60 @@ public class MainActivity extends ActionBarActivity {
 
         return super.onOptionsItemSelected(item);
     }
+
+    //MAKE GET REQUESTS
+    private class HttpAsyncTask extends AsyncTask<String, Void, String> {
+        @Override
+        protected String doInBackground(String... urls) {
+
+            return GET(urls[0]);
+        }
+        // onPostExecute displays the results of the AsyncTask.
+        @Override
+        protected void onPostExecute(String result) {
+//            try {
+//                JSONObject json = new JSONObject(result);
+//            } catch (JSONException e) {
+//                e.printStackTrace();
+//            }
+
+//            Toast.makeText(context, "Received!", Toast.LENGTH_LONG).show();
+//            Log.d("RESULT", result);
+
+            String slat = "";
+            String slng = "";
+            try {
+                JSONObject json = new JSONObject(result);
+                JSONArray results = json.getJSONArray("results");
+                JSONObject loc = results.getJSONObject(0).getJSONObject("geometry").getJSONObject("location");
+                Double lat = loc.getDouble("lat");
+                Double lng = loc.getDouble("lng");
+                slat = lat.toString();
+                slng = lng.toString();
+
+                Log.d("RESULT", slat);
+                Log.d("RESULT", slng);
+
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+            // Create a Uri from an intent string. Use the result to create an Intent.
+//            Uri gmmIntentUri = Uri.parse("google.streetview:cbll="+slat+","+slng);
+//            Uri gmmIntentUri = Uri.parse("geo:"+slat+","+slng);
+
+            Uri gmmIntentUri = Uri.parse("geo:37.783762,-122.412915?q=police");
+
+            // Create an Intent from gmmIntentUri. Set the action to ACTION_VIEW
+            Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
+            // Make the Intent explicit by setting the Google Maps package
+            mapIntent.setPackage("com.google.android.apps.maps");
+
+            // Attempt to start an activity that can handle the Intent
+            startActivity(mapIntent);
+
+        }
+    }
+
 
 }

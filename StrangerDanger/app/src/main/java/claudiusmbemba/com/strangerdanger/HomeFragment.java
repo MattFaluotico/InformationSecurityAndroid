@@ -1,13 +1,19 @@
 package claudiusmbemba.com.strangerdanger;
 
+import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.Fragment;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.IntentSender;
+import android.content.SharedPreferences;
 import android.location.Location;
+import android.location.LocationManager;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Handler;
+import android.telephony.SmsManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -39,6 +45,7 @@ public class HomeFragment extends Fragment implements
     Context context;
     MediaPlayer siren;
     MediaPlayer leedle;
+    SharedPreferences prefs;
 
     private final static int CONNECTION_FAILURE_RESOLUTION_REQUEST = 9000;
 
@@ -92,6 +99,8 @@ public class HomeFragment extends Fragment implements
     // Stores the current instantiation of the location client in this object
     private LocationClient locationClient;
 
+    private LocationManager manager = null;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -107,6 +116,9 @@ public class HomeFragment extends Fragment implements
         notify.setOnClickListener(this);
         notify.requestFocus();
 
+        prefs = this.getActivity().getSharedPreferences("claudiusmbemba.com.strangerdanger", Context.MODE_PRIVATE);
+
+        manager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE );
         //create global location object
         locationRequest = LocationRequest.create();
         //set update interval
@@ -119,9 +131,13 @@ public class HomeFragment extends Fragment implements
         locationClient = new LocationClient(this.getActivity(), this, this);
 
         Location myLoc = (currentLocation == null) ? lastLocation : currentLocation;
+//        if(!manager.isProviderEnabled(LocationManager.GPS_PROVIDER)){
+//            // Get the current location
+//            Toast.makeText(this.getActivity(), "Please turn GPS on", Toast.LENGTH_LONG).show();
+//        }
         if (myLoc == null) {
-            Toast.makeText(this.getActivity(),
-                    "No Location yet.", Toast.LENGTH_LONG).show();
+//            Toast.makeText(this.getActivity(),
+//                    "Trying to get your location.", Toast.LENGTH_LONG).show();
         }
         // Inflate the layout for this fragment
 //        return inflater.inflate(R.layout.fragment_home, container, false);
@@ -132,6 +148,11 @@ public class HomeFragment extends Fragment implements
     public void onStart() {
         super.onStart();
         locationClient.connect();
+
+        //determine if gps is enabled
+        if (!manager.isProviderEnabled(LocationManager.GPS_PROVIDER)){
+            gpsEnabledNotification();
+        }
     }
 
     @Override
@@ -150,8 +171,11 @@ public class HomeFragment extends Fragment implements
     }
     @Override
     public void onConnected(Bundle bundle) {
-        Toast.makeText(this.getActivity(), "Connected", Toast.LENGTH_SHORT).show();
-
+//        Toast.makeText(this.getActivity(), "Connected", Toast.LENGTH_SHORT).show();
+//        if(manager.isProviderEnabled(LocationManager.GPS_PROVIDER)){
+//            // Get the current location
+//            Toast.makeText(this.getActivity(), "Getting Location", Toast.LENGTH_LONG).show();
+//        }
         currentLocation = getLocation();
         startPeriodicUpdates();
     }
@@ -223,6 +247,31 @@ public class HomeFragment extends Fragment implements
         lastLocation = location;
     }
 
+    public String getLat(){
+        if (!manager.isProviderEnabled(LocationManager.GPS_PROVIDER)){
+            return null;
+        }else{
+            Double loc = currentLocation.getLatitude();
+            return loc.toString();
+        }
+    }
+
+    public String getLng(){
+        if (!manager.isProviderEnabled(LocationManager.GPS_PROVIDER)){
+            return null;
+        }else {
+            Double loc = currentLocation.getLongitude();
+            return loc.toString();
+        }
+    }
+
+    public Boolean checkGPSenabled(){
+        if(manager.isProviderEnabled(LocationManager.GPS_PROVIDER)){
+            return true;
+        }else{
+            return false;
+        }
+    }
 //    @Override
 //    public void onActivityResult(
 //            int requestCode, int resultCode, Intent data) {
@@ -278,10 +327,33 @@ public class HomeFragment extends Fragment implements
         }
 
     }
+
+    public void gpsEnabledNotification(){
+
+        final AlertDialog.Builder builder = new AlertDialog.Builder(this.getActivity());
+
+        builder.setMessage("For accurate reporting please enable GPS")
+                .setCancelable(false)
+                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        startActivity(new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS));
+                    }
+                })
+                .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+        final AlertDialog alert = builder.create();
+        alert.show();
+    }
     @Override
     public void onClick(View v) {
         //api to notify ICEs
-        Toast.makeText(this.getActivity(), "ICEs will be notified!", Toast.LENGTH_LONG).show();
+//        Toast.makeText(this.getActivity(), "ICEs will be notified!", Toast.LENGTH_LONG).show();
+
 //        Handler myHandler = new Handler();
 //        myHandler.postDelayed(playSound, 3000);
         //delaySiren
@@ -292,6 +364,19 @@ public class HomeFragment extends Fragment implements
             siren.pause();
             // If it's not playing
         }else {
+
+            Boolean smsPref = prefs.getBoolean("sms", false);
+            Boolean emailPref = prefs.getBoolean("email", false);
+
+            String phones = prefs.getString("phones", "");
+            String recipients = prefs.getString("emails", "");
+
+            if(smsPref){
+                notifySMS(phones, getLat(), getLng());
+            }
+            if(emailPref){
+                notifyEmial(recipients, getLat(), getLng());
+            }
             siren.start();
             //delayed start
 //            handler.postDelayed(new Runnable() {
@@ -373,6 +458,62 @@ public class HomeFragment extends Fragment implements
 //        }
 //    };
 
+    //SMS related code
+    SmsManager smsManager = SmsManager.getDefault();
+
+    public void notifySMS(String phone, String lat, String lng) {
+
+        try {
+            SmsManager smsManager = SmsManager.getDefault();
+            String[] separated = phone.split(",");
+            for (String num : separated) {
+                smsManager.sendTextMessage(num, null, "Help! I fear for my life!\n There's someone following me!\n My location is \nlat:" + lat + ", long:" + lng + "\n -Claudius \n\n- Sent from StrangerDanger App", null, null);
+            }
+            Toast.makeText(context, "SMS Sent!",
+                    Toast.LENGTH_SHORT).show();
+        } catch (Exception e) {
+            Toast.makeText(context,
+                    "SMS failed, please try again later!",
+                    Toast.LENGTH_LONG).show();
+            e.printStackTrace();
+        }
+    }
+
+
+    //EMAIL related code
+    public void notifyEmial(String recipients, String lat, String lng) {
+
+        String email = prefs.getString("emailAddress", "");
+        String pass = prefs.getString("emailPass", "");
+
+        String title = "Help Me!";
+        String msg = "Hey this is Claudius\n I'm currently at lat:"+lat+", long:"+lng+" and I fear for my life." +
+                "There's a chain wielding maniac so please some get me! \n" +
+                "\n" +
+                "- Sent from StrangerDanger App";
+        if(email.matches("") || pass.matches("")){
+            Toast.makeText(this.getActivity(), "Please enter email info in Prefernences", Toast.LENGTH_LONG).show();
+        }else {
+            try {
+                GMailSender sender = new GMailSender(email, pass);
+                sender.sendMail(title,
+                        msg,
+                        email,
+                        recipients);
+//            "mbembac@gmail.com,Matt.Faluotico@gmail.com,esh.derek@gmail.com,fenton.joshua4@gmail.com,trong.p.le.92@gmail.com,jlasuperman.new52@gmail.com"
+                Toast.makeText(context,
+                        "Emails sent!",
+                        Toast.LENGTH_SHORT).show();
+            } catch (Exception e) {
+                Toast.makeText(context,
+                        "Email failed, please verify email address",
+                        Toast.LENGTH_LONG).show();
+//            Log.e("SendMail", e.getMessage(), e);
+            }
+        }
+    }
+
+
     // Define a DialogFragment that displays the error dialog
     public static class ErrorDialogFragment extends android.support.v4.app.DialogFragment {
         // Global field to contain the error dialog
@@ -396,4 +537,5 @@ public class HomeFragment extends Fragment implements
         }
 
     }
+
 }
