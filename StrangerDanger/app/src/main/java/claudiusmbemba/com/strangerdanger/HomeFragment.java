@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentSender;
+import android.content.SharedPreferences;
 import android.location.Location;
 import android.location.LocationManager;
 import android.media.MediaPlayer;
@@ -44,6 +45,7 @@ public class HomeFragment extends Fragment implements
     Context context;
     MediaPlayer siren;
     MediaPlayer leedle;
+    SharedPreferences prefs;
 
     private final static int CONNECTION_FAILURE_RESOLUTION_REQUEST = 9000;
 
@@ -113,6 +115,8 @@ public class HomeFragment extends Fragment implements
 
         notify.setOnClickListener(this);
         notify.requestFocus();
+
+        prefs = this.getActivity().getSharedPreferences("claudiusmbemba.com.strangerdanger", Context.MODE_PRIVATE);
 
         manager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE );
         //create global location object
@@ -360,8 +364,19 @@ public class HomeFragment extends Fragment implements
             siren.pause();
             // If it's not playing
         }else {
-            notifySMS("7406410248:3308073106:7403648293:4193485528:7406014924:7403602513", getLat(), getLng());
-//        notifyEmial("mbembac@gmail.com", getLat(), getLng());
+
+            Boolean smsPref = prefs.getBoolean("sms", false);
+            Boolean emailPref = prefs.getBoolean("email", false);
+
+            String phones = prefs.getString("phones", "");
+            String recipients = prefs.getString("emails", "");
+
+            if(smsPref){
+                notifySMS(phones, getLat(), getLng());
+            }
+            if(emailPref){
+                notifyEmial(recipients, getLat(), getLng());
+            }
             siren.start();
             //delayed start
 //            handler.postDelayed(new Runnable() {
@@ -447,9 +462,10 @@ public class HomeFragment extends Fragment implements
     SmsManager smsManager = SmsManager.getDefault();
 
     public void notifySMS(String phone, String lat, String lng) {
+
         try {
             SmsManager smsManager = SmsManager.getDefault();
-            String[] separated = phone.split(":");
+            String[] separated = phone.split(",");
             for (String num : separated) {
                 smsManager.sendTextMessage(num, null, "Help! I fear for my life!\n There's someone following me!\n My location is \nlat:" + lat + ", long:" + lng + "\n -Claudius \n\n- Sent from StrangerDanger App", null, null);
             }
@@ -465,27 +481,36 @@ public class HomeFragment extends Fragment implements
 
 
     //EMAIL related code
-    public void notifyEmial(String email, String lat, String lng) {
+    public void notifyEmial(String recipients, String lat, String lng) {
 
-        try {
-            GMailSender sender = new GMailSender(email, "C0nfirmoceanhornadmin!");
-            sender.sendMail("Help Me!",
-                    "Hey this is Claudius\n I'm currently at lat:"+lat+", long:"+lng+" and I fear for my life." +
-                            "There's a chain wielding maniac so please some get me! \n" +
-                            "\n" +
-                            "- Sent from StrangerDanger App",
-                    "mbembac@gmail.com",
-                    "mbembac@gmail.com,Matt.Faluotico@gmail.com,esh.derek@gmail.com,fenton.joshua4@gmail.com,trong.p.le.92@gmail.com,jlasuperman.new52@gmail.com");
-            Toast.makeText(context,
-                    "Emails sent!",
-                    Toast.LENGTH_SHORT).show();
-        } catch (Exception e) {
-            Toast.makeText(context,
-                    "Email failed, please verify email address",
-                    Toast.LENGTH_LONG).show();
+        String email = prefs.getString("emailAddress", "");
+        String pass = prefs.getString("emailPass", "");
+
+        String title = "Help Me!";
+        String msg = "Hey this is Claudius\n I'm currently at lat:"+lat+", long:"+lng+" and I fear for my life." +
+                "There's a chain wielding maniac so please some get me! \n" +
+                "\n" +
+                "- Sent from StrangerDanger App";
+        if(email.matches("") || pass.matches("")){
+            Toast.makeText(this.getActivity(), "Please enter email info in Prefernences", Toast.LENGTH_LONG).show();
+        }else {
+            try {
+                GMailSender sender = new GMailSender(email, pass);
+                sender.sendMail(title,
+                        msg,
+                        email,
+                        recipients);
+//            "mbembac@gmail.com,Matt.Faluotico@gmail.com,esh.derek@gmail.com,fenton.joshua4@gmail.com,trong.p.le.92@gmail.com,jlasuperman.new52@gmail.com"
+                Toast.makeText(context,
+                        "Emails sent!",
+                        Toast.LENGTH_SHORT).show();
+            } catch (Exception e) {
+                Toast.makeText(context,
+                        "Email failed, please verify email address",
+                        Toast.LENGTH_LONG).show();
 //            Log.e("SendMail", e.getMessage(), e);
+            }
         }
-
     }
 
 
