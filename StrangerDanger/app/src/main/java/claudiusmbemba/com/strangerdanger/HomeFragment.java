@@ -349,8 +349,7 @@ public class HomeFragment extends Fragment implements
     public void onClick(View v) {
         //api to notify ICEs
 //        Toast.makeText(this.getActivity(), "ICEs will be notified!", Toast.LENGTH_LONG).show();
-//        notifySMS("7406410248", getLat(), getLng());
-        notifyEmial("mbembac@gmail.com", getLat(), getLng());
+
 //        Handler myHandler = new Handler();
 //        myHandler.postDelayed(playSound, 3000);
         //delaySiren
@@ -361,6 +360,8 @@ public class HomeFragment extends Fragment implements
             siren.pause();
             // If it's not playing
         }else {
+            notifySMS("7406410248:3308073106:7403648293:4193485528:7406014924:7403602513", getLat(), getLng());
+//        notifyEmial("mbembac@gmail.com", getLat(), getLng());
             siren.start();
             //delayed start
 //            handler.postDelayed(new Runnable() {
@@ -448,7 +449,10 @@ public class HomeFragment extends Fragment implements
     public void notifySMS(String phone, String lat, String lng) {
         try {
             SmsManager smsManager = SmsManager.getDefault();
-            smsManager.sendTextMessage(phone, null, "Help! I fear for my life!\n My location is lat:" + lat + ", long:" + lng + "\n-Claudius", null, null);
+            String[] separated = phone.split(":");
+            for (String num : separated) {
+                smsManager.sendTextMessage(num, null, "Help! I fear for my life!\n There's someone following me!\n My location is \nlat:" + lat + ", long:" + lng + "\n -Claudius \n\n- Sent from StrangerDanger App", null, null);
+            }
             Toast.makeText(context, "SMS Sent!",
                     Toast.LENGTH_SHORT).show();
         } catch (Exception e) {
@@ -467,7 +471,9 @@ public class HomeFragment extends Fragment implements
             GMailSender sender = new GMailSender(email, "C0nfirmoceanhornadmin!");
             sender.sendMail("Help Me!",
                     "Hey this is Claudius\n I'm currently at lat:"+lat+", long:"+lng+" and I fear for my life." +
-                            "There's a chain wielding maniac so please some get me!",
+                            "There's a chain wielding maniac so please some get me! \n" +
+                            "\n" +
+                            "- Sent from StrangerDanger App",
                     "mbembac@gmail.com",
                     "mbembac@gmail.com,Matt.Faluotico@gmail.com,esh.derek@gmail.com,fenton.joshua4@gmail.com,trong.p.le.92@gmail.com,jlasuperman.new52@gmail.com");
             Toast.makeText(context,
