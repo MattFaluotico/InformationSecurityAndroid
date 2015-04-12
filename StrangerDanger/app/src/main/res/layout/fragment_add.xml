@@ -47,7 +47,7 @@
                     android:id="@+id/contacts_view"
                     android:layout_alignParentTop="true"
                     android:layout_centerHorizontal="true"
-                    android:textSize="10sp"/>
+                    android:textSize="13sp"/>
             </RelativeLayout>
 
         </LinearLayout>
