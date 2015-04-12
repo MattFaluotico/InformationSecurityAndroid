@@ -1,10 +1,14 @@
 package claudiusmbemba.com.strangerdanger;
 
+import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.Fragment;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.IntentSender;
 import android.location.Location;
+import android.location.LocationManager;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Handler;
@@ -92,6 +96,8 @@ public class HomeFragment extends Fragment implements
     // Stores the current instantiation of the location client in this object
     private LocationClient locationClient;
 
+    private LocationManager manager = null;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -107,6 +113,7 @@ public class HomeFragment extends Fragment implements
         notify.setOnClickListener(this);
         notify.requestFocus();
 
+        manager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE );
         //create global location object
         locationRequest = LocationRequest.create();
         //set update interval
@@ -119,9 +126,13 @@ public class HomeFragment extends Fragment implements
         locationClient = new LocationClient(this.getActivity(), this, this);
 
         Location myLoc = (currentLocation == null) ? lastLocation : currentLocation;
+//        if(!manager.isProviderEnabled(LocationManager.GPS_PROVIDER)){
+//            // Get the current location
+//            Toast.makeText(this.getActivity(), "Please turn GPS on", Toast.LENGTH_LONG).show();
+//        }
         if (myLoc == null) {
-            Toast.makeText(this.getActivity(),
-                    "No Location yet.", Toast.LENGTH_LONG).show();
+//            Toast.makeText(this.getActivity(),
+//                    "Trying to get your location.", Toast.LENGTH_LONG).show();
         }
         // Inflate the layout for this fragment
 //        return inflater.inflate(R.layout.fragment_home, container, false);
@@ -132,6 +143,11 @@ public class HomeFragment extends Fragment implements
     public void onStart() {
         super.onStart();
         locationClient.connect();
+
+        //determine if gps is enabled
+        if (!manager.isProviderEnabled(LocationManager.GPS_PROVIDER)){
+            gpsEnabledNotification();
+        }
     }
 
     @Override
@@ -150,8 +166,11 @@ public class HomeFragment extends Fragment implements
     }
     @Override
     public void onConnected(Bundle bundle) {
-        Toast.makeText(this.getActivity(), "Connected", Toast.LENGTH_SHORT).show();
-
+//        Toast.makeText(this.getActivity(), "Connected", Toast.LENGTH_SHORT).show();
+//        if(manager.isProviderEnabled(LocationManager.GPS_PROVIDER)){
+//            // Get the current location
+//            Toast.makeText(this.getActivity(), "Getting Location", Toast.LENGTH_LONG).show();
+//        }
         currentLocation = getLocation();
         startPeriodicUpdates();
     }
@@ -223,6 +242,29 @@ public class HomeFragment extends Fragment implements
         lastLocation = location;
     }
 
+    public Double getLat(){
+        if (!manager.isProviderEnabled(LocationManager.GPS_PROVIDER)){
+            return null;
+        }else{
+            return currentLocation.getLatitude();
+        }
+    }
+
+    public Double getLng(){
+        if (!manager.isProviderEnabled(LocationManager.GPS_PROVIDER)){
+            return null;
+        }else {
+            return currentLocation.getLongitude();
+        }
+    }
+
+    public Boolean checkGPSenabled(){
+        if(manager.isProviderEnabled(LocationManager.GPS_PROVIDER)){
+            return true;
+        }else{
+            return false;
+        }
+    }
 //    @Override
 //    public void onActivityResult(
 //            int requestCode, int resultCode, Intent data) {
@@ -277,6 +319,28 @@ public class HomeFragment extends Fragment implements
 //            showErrorDialog(connectionResult.getErrorCode());
         }
 
+    }
+
+    public void gpsEnabledNotification(){
+
+        final AlertDialog.Builder builder = new AlertDialog.Builder(this.getActivity());
+
+        builder.setMessage("For accurate reporting please enable GPS")
+                .setCancelable(false)
+                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        startActivity(new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS));
+                    }
+                })
+                .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+        final AlertDialog alert = builder.create();
+        alert.show();
     }
     @Override
     public void onClick(View v) {
