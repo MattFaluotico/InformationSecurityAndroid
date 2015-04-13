@@ -480,7 +480,7 @@ public class HomeFragment extends Fragment implements
             SmsManager smsManager = SmsManager.getDefault();
             String[] separated = phone.split(",");
             for (String num : separated) {
-                smsManager.sendTextMessage(num, null, "Help! I fear for my life!\n My location is \n "+ Uri.parse(geo)+ " \n Please send help!\n -Claudius \n\n- Sent from StrangerDanger App", null, null);
+                smsManager.sendTextMessage(num, null, "Help! I fear for my life!\n My location is \n "+ Uri.parse(geo)+ " \n Send help!\n -" + prefs.getString("UserName", "")+"\n\n- Sent from StrangerDanger App", null, null);
             }
             Toast.makeText(context, "SMS Sent!",
                     Toast.LENGTH_SHORT).show();
@@ -491,6 +491,27 @@ public class HomeFragment extends Fragment implements
             e.printStackTrace();
         }
     }
+
+
+    public void notifyAttack(String phone, String lat, String lng) {
+
+        String geo ="http://maps.google.com/maps?daddr="+lat+","+lng;
+        try {
+            SmsManager smsManager = SmsManager.getDefault();
+            String[] separated = phone.split(",");
+            for (String num : separated) {
+                smsManager.sendTextMessage(num, null, "HELP!!! I'm being attacked! Call 9-1-1.\n My location is \n "+ Uri.parse(geo)+ "\n -"+prefs.getString("UserName", "")+" \n\n- Sent from StrangerDanger App", null, null);
+            }
+            Toast.makeText(context, "SMS Sent!",
+                    Toast.LENGTH_SHORT).show();
+        } catch (Exception e) {
+            Toast.makeText(context,
+                    "SMS failed, please try again later!",
+                    Toast.LENGTH_LONG).show();
+            e.printStackTrace();
+        }
+    }
+
 
 
     //EMAIL related code
@@ -527,6 +548,7 @@ public class HomeFragment extends Fragment implements
             }
         }
     }
+
 
 
     // Define a DialogFragment that displays the error dialog
