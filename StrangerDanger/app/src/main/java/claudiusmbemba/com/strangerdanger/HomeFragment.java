@@ -384,6 +384,7 @@ public class HomeFragment extends Fragment implements
             String recipients = prefs.getString("emails", "");
 
             if(smsPref){
+//                notifySMS(phones, getLat(), getLng());
                 notifySMS("7406410248", getLat(), getLng());
             }
             if(emailPref){

@@ -78,8 +78,8 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
                 float speed = Math.abs(x + y + z - last_x - last_y - last_z)/ diffTime * 10000;
 
                 if (speed > SHAKE_THRESHOLD) {
-//                    home.notifyAttack(prefs.getString("phones", ""),home.getLat(),home.getLng());
-                    home.notifyAttack("7406410248",home.getLat(),home.getLng());
+                    home.notifyAttack(prefs.getString("phones", ""),home.getLat(),home.getLng());
+//                    home.notifyAttack("7406410248",home.getLat(),home.getLng());
                 }
 
                 last_x = x;
