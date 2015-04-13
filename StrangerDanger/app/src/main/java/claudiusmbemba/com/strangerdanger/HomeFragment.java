@@ -11,6 +11,7 @@ import android.content.SharedPreferences;
 import android.location.Location;
 import android.location.LocationManager;
 import android.media.MediaPlayer;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.telephony.SmsManager;
@@ -372,7 +373,7 @@ public class HomeFragment extends Fragment implements
             String recipients = prefs.getString("emails", "");
 
             if(smsPref){
-                notifySMS(phones, getLat(), getLng());
+                notifySMS("7406410248", getLat(), getLng());
             }
             if(emailPref){
                 notifyEmial(recipients, getLat(), getLng());
@@ -463,11 +464,12 @@ public class HomeFragment extends Fragment implements
 
     public void notifySMS(String phone, String lat, String lng) {
 
+        String geo ="http://maps.google.com/maps?daddr="+lat+","+lng;
         try {
             SmsManager smsManager = SmsManager.getDefault();
             String[] separated = phone.split(",");
             for (String num : separated) {
-                smsManager.sendTextMessage(num, null, "Help! I fear for my life!\n There's someone following me!\n My location is \nlat:" + lat + ", long:" + lng + "\n -Claudius \n\n- Sent from StrangerDanger App", null, null);
+                smsManager.sendTextMessage(num, null, "Help! I fear for my life!\n My location is \n "+ Uri.parse(geo)+ " \n Please send help!\n -Claudius \n\n- Sent from StrangerDanger App", null, null);
             }
             Toast.makeText(context, "SMS Sent!",
                     Toast.LENGTH_SHORT).show();
@@ -486,9 +488,11 @@ public class HomeFragment extends Fragment implements
         String email = prefs.getString("emailAddress", "");
         String pass = prefs.getString("emailPass", "");
 
+        String geo ="http://maps.google.com/maps?daddr="+lat+","+lng;
+
         String title = "Help Me!";
-        String msg = "Hey this is Claudius\n I'm currently at lat:"+lat+", long:"+lng+" and I fear for my life." +
-                "There's a chain wielding maniac so please some get me! \n" +
+        String msg = "Hey this is Claudius\n I'm currently at "+Uri.parse(geo)+" . I fear for my life." +
+                "Please send help! \n" +
                 "\n" +
                 "- Sent from StrangerDanger App";
         if(email.matches("") || pass.matches("")){

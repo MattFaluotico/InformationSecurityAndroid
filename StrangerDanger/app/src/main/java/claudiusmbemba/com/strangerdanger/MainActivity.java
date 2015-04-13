@@ -29,9 +29,6 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-<<<<<<< HEAD
-import java.io.File;
-=======
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
@@ -45,11 +42,9 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
->>>>>>> UIwork
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Locale;
-
 
 public class MainActivity extends ActionBarActivity {
 
@@ -310,34 +305,7 @@ public class MainActivity extends ActionBarActivity {
         //activty indicator
 
         //make async call
-<<<<<<< HEAD
-//        HttpClient httpclient = new DefaultHttpClient();
-//        HttpResponse response = httpclient.execute(new HttpGet(""));
-//        StatusLine statusLine = response.getStatusLine();
-//        if(statusLine.getStatusCode() == HttpStatus.SC_OK){
-//            ByteArrayOutputStream out = new ByteArrayOutputStream();
-//            try {
-//                response.getEntity().writeTo(out);
-//            } catch (IOException e) {
-//                e.printStackTrace();
-//            }
-//            String responseString = out.toString();
-//            out.close();
-//            //..more logic
-//        } else{
-//            //Closes the connection.
-//            try {
-//                response.getEntity().getContent().close();
-//            } catch (IOException e) {
-//                e.printStackTrace();
-//            }
-//            try {
-//                throw new IOException(statusLine.getReasonPhrase());
-//            } catch (IOException e) {
-//                e.printStackTrace();
-//            }
-//        }
-=======
+
         // call AsynTask to perform network operation on separate thread
 //        new HttpAsyncTask().execute("https://maps.googleapis.com/maps/api/place/search/json?location=37.785835,-122.406418&rankby=distance&types=police&sensor=false&key=AIzaSyCU7rZMOqBsI87fpoZBSIxQPs0A9yLK6k0");
 
@@ -386,7 +354,6 @@ public class MainActivity extends ActionBarActivity {
                 result = convertInputStreamToString(inputStream);
             else
                 result = "Did not work!";
->>>>>>> UIwork
 
         } catch (Exception e) {
             Log.d("InputStream", e.getLocalizedMessage());
