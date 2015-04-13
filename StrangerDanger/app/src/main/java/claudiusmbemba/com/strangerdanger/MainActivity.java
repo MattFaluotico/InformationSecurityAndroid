@@ -5,6 +5,7 @@ import android.app.Fragment;
 import android.app.FragmentManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
@@ -119,6 +120,7 @@ public class MainActivity extends ActionBarActivity {
     private Fragment fragment = null;
     private HomeFragment home;
 
+    SharedPreferences prefs;
     ArrayList<NavItem> mNavItems = new ArrayList<NavItem>();
 
     //camera intents
@@ -183,6 +185,18 @@ public class MainActivity extends ActionBarActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         context = this;
+
+        prefs = this.getSharedPreferences("claudiusmbemba.com.strangerdanger", MODE_PRIVATE);
+
+        //set UserName
+        TextView username = (TextView) this.findViewById(R.id.userName);
+
+        String uName = prefs.getString("UserName", "");
+        if(uName.matches("")){
+            username.setText("Add Name in Preferences");
+        }else{
+            username.setText(uName);
+        }
 
         mNavItems.add(new NavItem("Home", "Notify ICEs", R.drawable.home));
         mNavItems.add(new NavItem("Edit ICE Contacts", "Edit your ICE Contacts", R.drawable.contact));

@@ -29,6 +29,7 @@ public class PreferencesFragment extends Fragment implements View.OnClickListene
     View email_cred;
     EditText emailAddress;
     EditText emailPass;
+    EditText userName;
 
     SharedPreferences prefs;
     @Override
@@ -48,6 +49,13 @@ public class PreferencesFragment extends Fragment implements View.OnClickListene
         email_cred = view.findViewById(R.id.email_credentials);
         emailAddress = (EditText) view.findViewById(R.id.email_cred_text);
         emailPass = (EditText) view.findViewById(R.id.email_pass_cred_text);
+
+        userName = (EditText) view.findViewById(R.id.userName_text);
+
+        String uName = prefs.getString("UserName", "");
+        if(!uName.matches("")){
+            userName.setText(uName);
+        }
 
         if(prefs.getBoolean("sms", false)){
             sms.setChecked(true);
@@ -81,7 +89,7 @@ public class PreferencesFragment extends Fragment implements View.OnClickListene
         String emailAdd = emailAddress.getText().toString();
         String pass = emailPass.getText().toString();
 
-        prefs.edit().putBoolean("sms", smsPref).putBoolean("email", emailPref).putBoolean("alerts", alertPref).putString("emailAddress", emailAdd).putString("emailPass", pass).commit();
+        prefs.edit().putBoolean("sms", smsPref).putBoolean("email", emailPref).putBoolean("alerts", alertPref).putString("emailAddress", emailAdd).putString("emailPass", pass).putString("UserName", userName.getText().toString()).commit();
 
         Toast.makeText(this.getActivity(), "Changes saved!", Toast.LENGTH_LONG).show();
     }

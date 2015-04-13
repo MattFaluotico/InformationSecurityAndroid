@@ -21,6 +21,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -118,6 +119,16 @@ public class HomeFragment extends Fragment implements
         notify.requestFocus();
 
         prefs = this.getActivity().getSharedPreferences("claudiusmbemba.com.strangerdanger", Context.MODE_PRIVATE);
+
+        //set UserName
+        TextView username = (TextView) this.getActivity().findViewById(R.id.userName);
+
+        String uName = prefs.getString("UserName", "");
+        if(uName.matches("")){
+            username.setText("Add Name in Preferences");
+        }else{
+            username.setText(uName);
+        }
 
         manager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE );
         //create global location object
