@@ -1,9 +1,11 @@
 package claudiusmbemba.com.strangerdanger;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.hardware.Sensor;
@@ -58,7 +60,7 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
     private Sensor senAccelerometer;
     private long lastUpdate = 0;
     private float last_x, last_y, last_z;
-    private static final int SHAKE_THRESHOLD = 600;
+    private static final int SHAKE_THRESHOLD = 2000;
 
     @Override
     public void onSensorChanged(SensorEvent event) {
@@ -78,8 +80,8 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
                 float speed = Math.abs(x + y + z - last_x - last_y - last_z)/ diffTime * 10000;
 
                 if (speed > SHAKE_THRESHOLD) {
-                    home.notifyAttack(prefs.getString("phones", ""),home.getLat(),home.getLng());
-//                    home.notifyAttack("7406410248",home.getLat(),home.getLng());
+//                    home.notifyAttack(prefs.getString("phones", ""),home.getLat(),home.getLng());
+                    home.notifyAttack("7406410248",home.getLat(),home.getLng());
                 }
 
                 last_x = x;
@@ -97,6 +99,7 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
     protected void onPause() {
         super.onPause();
         senSensorManager.unregisterListener(this);
+        prefs.edit().putBoolean("alert_checked", true).apply();
     }
     protected void onResume() {
         super.onResume();
@@ -312,13 +315,22 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
                 .commit();
         setTitle("Home");
 
+        if(prefs.getBoolean("alerts", false)) {
+            prefs.edit().putBoolean("alert_checked", true).apply();
+        }
     }
+
+
 
     /*
 * Called when a particular item from the navigation drawer
 * is selected.
 * */
     private void selectItemFromDrawer(int position) {
+
+        if(prefs.getBoolean("alert_checked", false)){
+            checkForLocationAlert();
+        }
 
         NavItem item = mNavItems.get(position);
 
@@ -374,13 +386,6 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
 
     private void getNearByPolice() {
 
-        //activty indicator
-
-        //make async call
-
-        // call AsynTask to perform network operation on separate thread
-//        new HttpAsyncTask().execute("https://maps.googleapis.com/maps/api/place/search/json?location=37.785835,-122.406418&rankby=distance&types=police&sensor=false&key=AIzaSyCU7rZMOqBsI87fpoZBSIxQPs0A9yLK6k0");
-
         //getLocation
 
         String lat = null, lng = null;
@@ -406,45 +411,6 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
         }
     }
 
-    //HTTP GET CALL
-    public static String GET(String url){
-        InputStream inputStream = null;
-        String result = "";
-        try {
-
-            // create HttpClient
-            HttpClient httpclient = new DefaultHttpClient();
-
-            // make GET request to the given URL
-            HttpResponse httpResponse = httpclient.execute(new HttpGet(url));
-
-            // receive response as inputStream
-            inputStream = httpResponse.getEntity().getContent();
-
-            // convert inputstream to string
-            if(inputStream != null)
-                result = convertInputStreamToString(inputStream);
-            else
-                result = "Did not work!";
-
-        } catch (Exception e) {
-            Log.d("InputStream", e.getLocalizedMessage());
-        }
-
-        return result;
-    }
-
-    private static String convertInputStreamToString(InputStream inputStream) throws IOException {
-        BufferedReader bufferedReader = new BufferedReader( new InputStreamReader(inputStream));
-        String line = "";
-        String result = "";
-        while((line = bufferedReader.readLine()) != null)
-            result += line;
-
-        inputStream.close();
-        return result;
-
-    }
 
     public boolean isConnected(){
         ConnectivityManager connMgr = (ConnectivityManager) getSystemService(Activity.CONNECTIVITY_SERVICE);
@@ -502,6 +468,78 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
         return super.onOptionsItemSelected(item);
     }
 
+    public void checkForLocationAlert() {
+
+        if(home.checkGPSenabled()){
+//        if(true){
+            // call AsynTask to perform network operation on separate thread
+//        new HttpAsyncTask().execute("https://maps.googleapis.com/maps/api/place/search/json?location=37.785835,-122.406418&rankby=distance&types=police&sensor=false&key=AIzaSyCU7rZMOqBsI87fpoZBSIxQPs0A9yLK6k0");
+            new HttpAsyncTask().execute("http://api.spotcrime.com/crimes.json?lat="+home.getLat()+"&lon="+home.getLng()+"&radius=0.050&callback=&key=MLC-restricted-key");
+            //0-10: Low crime
+            //11-30: Med crime
+            //31+: high crime
+        }else{
+            Toast.makeText(this, "Enable GPS for Location Alerts", Toast.LENGTH_LONG).show();
+        }
+    }
+
+    public void LocationAlertNotification(String msg){
+
+        final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
+        builder.setMessage(msg)
+                .setCancelable(true)
+                .setPositiveButton("I Got It", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                })
+                .setTitle("Location Alert");
+        final AlertDialog alert = builder.create();
+        prefs.edit().putBoolean("alert_checked", false).apply();
+        alert.show();
+    }
+
+    //HTTP GET CALL
+    private static String convertInputStreamToString(InputStream inputStream) throws IOException {
+        BufferedReader bufferedReader = new BufferedReader( new InputStreamReader(inputStream));
+        String line = "";
+        String result = "";
+        while((line = bufferedReader.readLine()) != null)
+            result += line;
+
+        inputStream.close();
+        return result;
+
+    }
+
+    public static String GET(String url){
+        InputStream inputStream = null;
+        String result = "";
+        try {
+
+            // create HttpClient
+            HttpClient httpclient = new DefaultHttpClient();
+
+            // make GET request to the given URL
+            HttpResponse httpResponse = httpclient.execute(new HttpGet(url));
+
+            // receive response as inputStream
+            inputStream = httpResponse.getEntity().getContent();
+
+            // convert inputstream to string
+            if(inputStream != null)
+                result = convertInputStreamToString(inputStream);
+            else
+                result = "Did not work!";
+
+        } catch (Exception e) {
+            Log.d("InputStream", e.getLocalizedMessage());
+        }
+
+        return result;
+    }
     //MAKE GET REQUESTS
     private class HttpAsyncTask extends AsyncTask<String, Void, String> {
         @Override
@@ -519,39 +557,44 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
 //            }
 
 //            Toast.makeText(context, "Received!", Toast.LENGTH_LONG).show();
-//            Log.d("RESULT", result);
+            Log.d("RESULT", result);
 
-            String slat = "";
-            String slng = "";
+            int crimes_count = 0;
             try {
                 JSONObject json = new JSONObject(result);
-                JSONArray results = json.getJSONArray("results");
-                JSONObject loc = results.getJSONObject(0).getJSONObject("geometry").getJSONObject("location");
-                Double lat = loc.getDouble("lat");
-                Double lng = loc.getDouble("lng");
-                slat = lat.toString();
-                slng = lng.toString();
-
-                Log.d("RESULT", slat);
-                Log.d("RESULT", slng);
+                JSONArray crimes = json.getJSONArray("crimes");
+                crimes_count = crimes.length();
 
             } catch (JSONException e) {
                 e.printStackTrace();
             }
 
-            // Create a Uri from an intent string. Use the result to create an Intent.
-//            Uri gmmIntentUri = Uri.parse("google.streetview:cbll="+slat+","+slng);
-//            Uri gmmIntentUri = Uri.parse("geo:"+slat+","+slng);
-
-            Uri gmmIntentUri = Uri.parse("geo:37.783762,-122.412915?q=police");
-
-            // Create an Intent from gmmIntentUri. Set the action to ACTION_VIEW
-            Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
-            // Make the Intent explicit by setting the Google Maps package
-            mapIntent.setPackage("com.google.android.apps.maps");
-
-            // Attempt to start an activity that can handle the Intent
-            startActivity(mapIntent);
+            //0-10: Low crime
+            //11-30: Med crime
+            //31+: high crime
+            if(crimes_count <= 10){
+                LocationAlertNotification("Our records indicate:\nA LOW CRIME RATE Area.\nBut stay alert out there!");
+//                Toast.makeText(context, "Our records indicate:\n Low Crime Rate Area", Toast.LENGTH_LONG).show();
+            }else if(crimes_count <=30){
+                LocationAlertNotification("Our records indicate:\nA MED CRIME RATE Area.\nEyes Peeled Please!");
+//                Toast.makeText(context, "Our records indicate:\n Med Crime Rate Area", Toast.LENGTH_LONG).show();
+            }else{
+                LocationAlertNotification("Our records indicate:\nA HIGH CRIME RATE Area.\nExercise Extreme Caution at night!");
+//                Toast.makeText(context, "Our records indicate:\n High Crime Rate Area", Toast.LENGTH_LONG).show();
+            }
+//            // Create a Uri from an intent string. Use the result to create an Intent.
+////            Uri gmmIntentUri = Uri.parse("google.streetview:cbll="+slat+","+slng);
+////            Uri gmmIntentUri = Uri.parse("geo:"+slat+","+slng);
+//
+//            Uri gmmIntentUri = Uri.parse("geo:37.783762,-122.412915?q=police");
+//
+//            // Create an Intent from gmmIntentUri. Set the action to ACTION_VIEW
+//            Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
+//            // Make the Intent explicit by setting the Google Maps package
+//            mapIntent.setPackage("com.google.android.apps.maps");
+//
+//            // Attempt to start an activity that can handle the Intent
+//            startActivity(mapIntent);
 
         }
     }

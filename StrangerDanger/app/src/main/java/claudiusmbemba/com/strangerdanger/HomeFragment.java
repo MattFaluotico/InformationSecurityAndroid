@@ -153,6 +153,7 @@ public class HomeFragment extends Fragment implements
         }
         // Inflate the layout for this fragment
 //        return inflater.inflate(R.layout.fragment_home, container, false);
+
         return view;
     }
 
@@ -251,13 +252,46 @@ public class HomeFragment extends Fragment implements
             return false;
         }
     }
+
+//    public void checkForLocationAlert() {
+//
+//        if(checkGPSenabled()){
+////        if(true){
+//            // call AsynTask to perform network operation on separate thread
+////        new HttpAsyncTask().execute("https://maps.googleapis.com/maps/api/place/search/json?location=37.785835,-122.406418&rankby=distance&types=police&sensor=false&key=AIzaSyCU7rZMOqBsI87fpoZBSIxQPs0A9yLK6k0");
+//            new HttpAsyncTask().execute("http://api.spotcrime.com/crimes.json?lat="+getLat()+"&lon="+getLng()+"&radius=0.050&callback=&key=MLC-restricted-key");
+//            //0-10: Low crime
+//            //11-30: Med crime
+//            //31+: high crime
+//        }else{
+//            Toast.makeText(this.getActivity(), "Enable GPS for Location Alerts", Toast.LENGTH_LONG).show();
+//        }
+//    }
+
     @Override
     public void onLocationChanged(Location location) {
         currentLocation = location;
-        String msg = "Update location: " + Double.toString(location.getLatitude()) + ", " + Double.toString(location.getLongitude());
+//        String msg = "Update location: " + Double.toString(location.getLatitude()) + ", " + Double.toString(location.getLongitude());
 //        Toast.makeText(this.getActivity(), msg, Toast.LENGTH_LONG).show();
         lastLocation = location;
     }
+
+//    public void LocationAlertNotification(String msg){
+//
+//        final AlertDialog.Builder builder = new AlertDialog.Builder(this.getActivity());
+//
+//        builder.setMessage(msg)
+//                .setCancelable(true)
+//                .setPositiveButton("I Got It", new DialogInterface.OnClickListener() {
+//                    @Override
+//                    public void onClick(DialogInterface dialog, int which) {
+//                        dialog.dismiss();
+//                    }
+//                })
+//                .setTitle("Location Alert");
+//        final AlertDialog alert = builder.create();
+//        alert.show();
+//    }
 
     public String getLat(){
         if (!manager.isProviderEnabled(LocationManager.GPS_PROVIDER)){
@@ -278,7 +312,7 @@ public class HomeFragment extends Fragment implements
     }
 
     public Boolean checkGPSenabled(){
-        if(manager.isProviderEnabled(LocationManager.GPS_PROVIDER)){
+        if(manager.isProviderEnabled(LocationManager.GPS_PROVIDER) || manager != null){
             return true;
         }else{
             return false;
@@ -550,6 +584,104 @@ public class HomeFragment extends Fragment implements
         }
     }
 
+
+//    //HTTP GET CALL
+//    private static String convertInputStreamToString(InputStream inputStream) throws IOException {
+//        BufferedReader bufferedReader = new BufferedReader( new InputStreamReader(inputStream));
+//        String line = "";
+//        String result = "";
+//        while((line = bufferedReader.readLine()) != null)
+//            result += line;
+//
+//        inputStream.close();
+//        return result;
+//
+//    }
+//
+//    public static String GET(String url){
+//        InputStream inputStream = null;
+//        String result = "";
+//        try {
+//
+//            // create HttpClient
+//            HttpClient httpclient = new DefaultHttpClient();
+//
+//            // make GET request to the given URL
+//            HttpResponse httpResponse = httpclient.execute(new HttpGet(url));
+//
+//            // receive response as inputStream
+//            inputStream = httpResponse.getEntity().getContent();
+//
+//            // convert inputstream to string
+//            if(inputStream != null)
+//                result = convertInputStreamToString(inputStream);
+//            else
+//                result = "Did not work!";
+//
+//        } catch (Exception e) {
+//            Log.d("InputStream", e.getLocalizedMessage());
+//        }
+//
+//        return result;
+//    }
+//    //MAKE GET REQUESTS
+//    private class HttpAsyncTask extends AsyncTask<String, Void, String> {
+//        @Override
+//        protected String doInBackground(String... urls) {
+//
+//            return GET(urls[0]);
+//        }
+//        // onPostExecute displays the results of the AsyncTask.
+//        @Override
+//        protected void onPostExecute(String result) {
+////            try {
+////                JSONObject json = new JSONObject(result);
+////            } catch (JSONException e) {
+////                e.printStackTrace();
+////            }
+//
+////            Toast.makeText(context, "Received!", Toast.LENGTH_LONG).show();
+//            Log.d("RESULT", result);
+//
+//            int crimes_count = 0;
+//            try {
+//                JSONObject json = new JSONObject(result);
+//                JSONArray crimes = json.getJSONArray("crimes");
+//                crimes_count = crimes.length();
+//
+//            } catch (JSONException e) {
+//                e.printStackTrace();
+//            }
+//
+//            //0-10: Low crime
+//            //11-30: Med crime
+//            //31+: high crime
+//            if(crimes_count <= 10){
+//                LocationAlertNotification("Our records indicate:\nA LOW CRIME RATE Area.\nBut stay alert out there!");
+////                Toast.makeText(context, "Our records indicate:\n Low Crime Rate Area", Toast.LENGTH_LONG).show();
+//            }else if(crimes_count <=30){
+//                LocationAlertNotification("Our records indicate:\nA MED CRIME RATE Area.\nEyes Peeled Please!");
+////                Toast.makeText(context, "Our records indicate:\n Med Crime Rate Area", Toast.LENGTH_LONG).show();
+//            }else{
+//                LocationAlertNotification("Our records indicate:\nA HIGH CRIME RATE Area.\nExercise Extreme Caution at night!");
+////                Toast.makeText(context, "Our records indicate:\n High Crime Rate Area", Toast.LENGTH_LONG).show();
+//            }
+////            // Create a Uri from an intent string. Use the result to create an Intent.
+//////            Uri gmmIntentUri = Uri.parse("google.streetview:cbll="+slat+","+slng);
+//////            Uri gmmIntentUri = Uri.parse("geo:"+slat+","+slng);
+////
+////            Uri gmmIntentUri = Uri.parse("geo:37.783762,-122.412915?q=police");
+////
+////            // Create an Intent from gmmIntentUri. Set the action to ACTION_VIEW
+////            Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
+////            // Make the Intent explicit by setting the Google Maps package
+////            mapIntent.setPackage("com.google.android.apps.maps");
+////
+////            // Attempt to start an activity that can handle the Intent
+////            startActivity(mapIntent);
+//
+//        }
+//    }
 
 
     // Define a DialogFragment that displays the error dialog
