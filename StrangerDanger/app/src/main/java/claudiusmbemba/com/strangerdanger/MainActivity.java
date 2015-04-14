@@ -30,6 +30,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
@@ -99,7 +100,7 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
     protected void onPause() {
         super.onPause();
         senSensorManager.unregisterListener(this);
-        prefs.edit().putBoolean("alert_checked", true).apply();
+//        prefs.edit().putBoolean("alert_checked", true).apply();
     }
     protected void onResume() {
         super.onResume();
@@ -328,10 +329,6 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
 * */
     private void selectItemFromDrawer(int position) {
 
-        if(prefs.getBoolean("alert_checked", false)){
-            checkForLocationAlert();
-        }
-
         NavItem item = mNavItems.get(position);
 
         FragmentManager fragmentManager = getFragmentManager();
@@ -339,12 +336,15 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
         switch (item.mTitle) {
             case "Home":
                 fragment = new HomeFragment();
+                setTitle(mNavItems.get(position).mTitle);
                 break;
             case "About":
                 fragment = new AboutFragment();
+                setTitle(mNavItems.get(position).mTitle);
                 break;
             case "Preferences":
                 fragment = new PreferencesFragment();
+                setTitle(mNavItems.get(position).mTitle);
                 break;
             case "Police":
                 //call Google place API
@@ -361,8 +361,10 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
                 break;
             case "Edit ICE Contacts":
                 fragment = new AddContactFragment();
+                setTitle(mNavItems.get(position).mTitle);
                 break;
             case "Logout":
+                //launch Phone home intent
                 Intent logout_intent = new Intent(Intent.ACTION_MAIN);
                 logout_intent.addCategory(Intent.CATEGORY_HOME);
                 logout_intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -377,7 +379,6 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
                     .replace(R.id.mainContent, fragment)
                     .commit();
             mDrawerList.setItemChecked(position, true);
-            setTitle(mNavItems.get(position).mTitle);
         }
 
         // Close the drawer
@@ -425,6 +426,9 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
 
     // Called when invalidateOptionsMenu() is invoked
     public boolean onPrepareOptionsMenu(Menu menu) {
+        if(prefs.getBoolean("alert_checked", false)){
+            checkForLocationAlert();
+        }
 // If the nav drawer is open, hide action items related to the content view
         boolean drawerOpen = mDrawerLayout.isDrawerOpen(mDrawerPane);
         menu.findItem(R.id.action_settings).setVisible(!drawerOpen);
@@ -469,17 +473,18 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
     }
 
     public void checkForLocationAlert() {
-
-        if(home.checkGPSenabled()){
+        if(prefs.getBoolean("alerts", false)) {
+            if (home.checkGPSenabled()) {
 //        if(true){
-            // call AsynTask to perform network operation on separate thread
+                // call AsynTask to perform network operation on separate thread
 //        new HttpAsyncTask().execute("https://maps.googleapis.com/maps/api/place/search/json?location=37.785835,-122.406418&rankby=distance&types=police&sensor=false&key=AIzaSyCU7rZMOqBsI87fpoZBSIxQPs0A9yLK6k0");
-            new HttpAsyncTask().execute("http://api.spotcrime.com/crimes.json?lat="+home.getLat()+"&lon="+home.getLng()+"&radius=0.050&callback=&key=MLC-restricted-key");
-            //0-10: Low crime
-            //11-30: Med crime
-            //31+: high crime
-        }else{
-            Toast.makeText(this, "Enable GPS for Location Alerts", Toast.LENGTH_LONG).show();
+                new HttpAsyncTask().execute("http://api.spotcrime.com/crimes.json?lat=" + home.getLat() + "&lon=" + home.getLng() + "&radius=0.050&callback=&key=MLC-restricted-key");
+                //0-10: Low crime
+                //11-30: Med crime
+                //31+: high crime
+            } else {
+                Toast.makeText(this, "Enable GPS for Location Alerts", Toast.LENGTH_LONG).show();
+            }
         }
     }
 

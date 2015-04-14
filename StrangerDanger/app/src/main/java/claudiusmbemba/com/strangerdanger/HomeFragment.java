@@ -21,6 +21,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -103,6 +104,8 @@ public class HomeFragment extends Fragment implements
 
     private LocationManager manager = null;
 
+    ImageButton siren_btn;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -117,6 +120,9 @@ public class HomeFragment extends Fragment implements
 
         notify.setOnClickListener(this);
         notify.requestFocus();
+
+        siren_btn = (ImageButton) view.findViewById(R.id.siren_button);
+        siren_btn.setOnClickListener(this);
 
         prefs = this.getActivity().getSharedPreferences("claudiusmbemba.com.strangerdanger", Context.MODE_PRIVATE);
 
@@ -270,10 +276,43 @@ public class HomeFragment extends Fragment implements
 
     @Override
     public void onLocationChanged(Location location) {
-        currentLocation = location;
 //        String msg = "Update location: " + Double.toString(location.getLatitude()) + ", " + Double.toString(location.getLongitude());
 //        Toast.makeText(this.getActivity(), msg, Toast.LENGTH_LONG).show();
+        double lat1 = currentLocation.getLatitude();
+        double lng1 = currentLocation.getLongitude();
+
+        double lat2 = location.getLatitude();
+        double lng2 = location.getLongitude();
+
+        // lat1 and lng1 are the values of a previously stored location
+        if (distance(lat1, lng1, lat2, lng2) > 0.3) { // if distance > 1 miles we take locations as equal
+            //do what you want to do...
+            ((MainActivity)getActivity()).checkForLocationAlert();
+        }
+        currentLocation = location;
+
         lastLocation = location;
+    }
+
+    /** calculates the distance between two locations in MILES */
+    private double distance(double lat1, double lng1, double lat2, double lng2) {
+
+        double earthRadius = 3958.75; // in miles, change to 6371 for kilometer output
+
+        double dLat = Math.toRadians(lat2-lat1);
+        double dLng = Math.toRadians(lng2-lng1);
+
+        double sindLat = Math.sin(dLat / 2);
+        double sindLng = Math.sin(dLng / 2);
+
+        double a = Math.pow(sindLat, 2) + Math.pow(sindLng, 2)
+                * Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2));
+
+        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+
+        double dist = earthRadius * c;
+
+        return dist; // output distance, in MILES
     }
 
 //    public void LocationAlertNotification(String msg){
@@ -400,32 +439,15 @@ public class HomeFragment extends Fragment implements
         //api to notify ICEs
 //        Toast.makeText(this.getActivity(), "ICEs will be notified!", Toast.LENGTH_LONG).show();
 
-//        Handler myHandler = new Handler();
-//        myHandler.postDelayed(playSound, 3000);
-        //delaySiren
-        final Handler handler = new Handler();
-        //Do something after 100ms
-        if(siren.isPlaying()) {
-            // Pause the music player
-            siren.pause();
-            // If it's not playing
-        }else {
-
-            Boolean smsPref = prefs.getBoolean("sms", false);
-            Boolean emailPref = prefs.getBoolean("email", false);
-
-            String phones = prefs.getString("phones", "");
-            String recipients = prefs.getString("emails", "");
-
-            if(smsPref){
-//                notifySMS(phones, getLat(), getLng());
-                notifySMS("7406410248", getLat(), getLng());
-            }
-            if(emailPref){
-                notifyEmial(recipients, getLat(), getLng());
-            }
-            siren.start();
-            //delayed start
+        if(v.getId() == R.id.siren_button){
+            if(siren.isPlaying()) {
+                // Pause the music player
+                siren.pause();
+                // If it's not playing
+            }else {
+                siren.start();
+                SendICENotification();
+                //delayed start
 //            handler.postDelayed(new Runnable() {
 //                @Override
 //                public void run() {
@@ -434,6 +456,31 @@ public class HomeFragment extends Fragment implements
 //                }
 //            }, 3000);
 //        }
+            }
+        }
+        SendICENotification();
+
+    }
+
+    private void SendICENotification() {
+        //        Handler myHandler = new Handler();
+//        myHandler.postDelayed(playSound, 3000);
+        //delaySiren
+        final Handler handler = new Handler();
+        //Do something after 100ms
+
+        Boolean smsPref = prefs.getBoolean("sms", false);
+        Boolean emailPref = prefs.getBoolean("email", false);
+
+        String phones = prefs.getString("phones", "");
+        String recipients = prefs.getString("emails", "");
+
+        if(smsPref){
+//                notifySMS(phones, getLat(), getLng());
+            notifySMS("7406410248", getLat(), getLng());
+        }
+        if(emailPref){
+            notifyEmial(recipients, getLat(), getLng());
         }
     }
 
