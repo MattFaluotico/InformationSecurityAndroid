@@ -3,6 +3,7 @@ package claudiusmbemba.com.strangerdanger;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.Fragment;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -12,6 +13,7 @@ import android.location.Location;
 import android.location.LocationManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.telephony.SmsManager;
@@ -47,9 +49,11 @@ public class HomeFragment extends Fragment implements
     private Button notify;
     private Context context;
     private MediaPlayer siren;
-//    private MediaPlayer leedle;
+    //    private MediaPlayer leedle;
     private SharedPreferences prefs;
     private ImageButton siren_btn;
+    private String email = prefs.getString("emailAddress", "");
+    private String pass = prefs.getString("emailPass", "");
 
     private final static int CONNECTION_FAILURE_RESOLUTION_REQUEST = 9000;
 
@@ -606,37 +610,18 @@ public class HomeFragment extends Fragment implements
     //EMAIL related code
     public void notifyEmial(String recipients, String lat, String lng) {
 
-        String email = prefs.getString("emailAddress", "");
-        String pass = prefs.getString("emailPass", "");
+        if(email.matches("") || pass.matches("")){
+            Toast.makeText(this.getActivity(), "Please enter email info in Preferences", Toast.LENGTH_LONG).show();
+        }else {
 
-        String geo ="http://maps.google.com/maps?daddr="+lat+","+lng;
+//            GMailSender sender = new GMailSender(email, pass);
+            GMailSender sender = new GMailSender("mbembac@gmail.com", "C0nfirmoceanhornadmin!");
 
-        String title = "Help Me!";
-        String msg = "Hey this is Claudius\n I'm currently at "+Uri.parse(geo)+" . I fear for my life." +
-                "Please send help! \n" +
-                "\n" +
-                "- Sent from StrangerDanger App";
-//        if(email.matches("") || pass.matches("")){
-//            Toast.makeText(this.getActivity(), "Please enter email info in Preferences", Toast.LENGTH_LONG).show();
-//        }else {
-            try {
-//                GMailSender sender = new GMailSender(email, pass);
-                GMailSender sender = new GMailSender("mbembac@gmail.com", "C0nfirmoceanhornadmin!");
-                sender.sendMail(title,
-                        msg,
-                        email,
-                        recipients);
-//            "mbembac@gmail.com,Matt.Faluotico@gmail.com,esh.derek@gmail.com,fenton.joshua4@gmail.com,trong.p.le.92@gmail.com,jlasuperman.new52@gmail.com"
-                Toast.makeText(context,
-                        "Emails sent!",
-                        Toast.LENGTH_SHORT).show();
-            } catch (Exception e) {
-                Toast.makeText(context,
-                        "Email failed, please verify email address",
-                        Toast.LENGTH_LONG).show();
-//            Log.e("SendMail", e.getMessage(), e);
-            }
-//        }
+            new SendMailTask().execute(sender);
+
+////            "mbembac@gmail.com,Matt.Faluotico@gmail.com,esh.derek@gmail.com,fenton.joshua4@gmail.com,trong.p.le.92@gmail.com,jlasuperman.new52@gmail.com"
+
+        }
     }
 
 
@@ -738,6 +723,48 @@ public class HomeFragment extends Fragment implements
 //        }
 //    }
 
+    //SENDMAIL ASYNC
+    private class SendMailTask extends AsyncTask<GMailSender, Void, Void> {
+        private ProgressDialog progressDialog;
+
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            progressDialog = ProgressDialog.show(getActivity(), "Please wait", "Sending mail", true, false);
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+            progressDialog.dismiss();
+            Toast.makeText(context, "Emails sent!", Toast.LENGTH_SHORT).show();
+        }
+
+        @Override
+        protected Void doInBackground(GMailSender... params) {
+
+            String recipients = prefs.getString("emails", "");
+            String geo = "http://maps.google.com/maps?daddr=" + getLat() + "," + getLng();
+
+            String title = "Help Me!";
+            String msg = "Hey this is Claudius\n I'm currently at " + Uri.parse(geo) + " . I fear for my life." +
+                    "Please send help! \n" +
+                    "\n" +
+                    "- Sent from StrangerDanger App";
+            try {
+
+                // add attachements
+                // params[0].addAttachment(Environment.getExternalStorageDirectory().getPath()+"/image.jpg");
+                params[0].sendMail(title, msg, "mbembac@gmail.com", "mbemba.1@osu.edu");
+//                params[0].sendMail(title, msg, email, recipients);
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
+    }
 
     // Define a DialogFragment that displays the error dialog
     public static class ErrorDialogFragment extends android.support.v4.app.DialogFragment {
