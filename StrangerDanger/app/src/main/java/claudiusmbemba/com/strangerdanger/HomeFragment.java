@@ -281,6 +281,8 @@ public class HomeFragment extends Fragment implements
 
     @Override
     public void onLocationChanged(Location location) {
+        currentLocation = location;
+
 //        String msg = "Update location: " + Double.toString(location.getLatitude()) + ", " + Double.toString(location.getLongitude());
 //        Toast.makeText(this.getActivity(), msg, Toast.LENGTH_LONG).show();
         if(lastLocation != null){
@@ -291,14 +293,13 @@ public class HomeFragment extends Fragment implements
             double lng2 = location.getLongitude();
 
             // lat1 and lng1 are the values of a previously stored location
-            if (distance(lat1, lng1, lat2, lng2) > 0.3) { // if distance > 1 miles we take locations as equal
-                //do what you want to do...
+            if (distance(lat1, lng1, lat2, lng2) > 2) { // if distance > 1 miles we take locations as equal
+                //notify
                 ((MainActivity)getActivity()).checkForLocationAlert();
+                //update lastknow location to current
+                lastLocation = location;
             }
         }
-        currentLocation = location;
-
-        lastLocation = location;
     }
 
     /** calculates the distance between two locations in MILES */
