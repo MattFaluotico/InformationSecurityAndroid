@@ -488,8 +488,8 @@ public class HomeFragment extends Fragment implements
         Boolean smsPref = prefs.getBoolean("sms", false);
         Boolean emailPref = prefs.getBoolean("email", false);
 
-        String phones = prefs.getString("phones", "");
-        String recipients = prefs.getString("emails", "");
+        String phones = prefs.getString("phone_0", "") +","+ prefs.getString("phone_1", "") +","+ prefs.getString("phone_2", "") +","+ prefs.getString("phone_3", "") +","+ prefs.getString("phone_4", "");
+        String recipients = prefs.getString("email_0", "") +","+ prefs.getString("email_1", "") +","+ prefs.getString("email_2", "") +","+ prefs.getString("email_3", "") +","+ prefs.getString("email_4", "");
 
         if(smsPref){
             if(!phones.matches("")) {
@@ -586,6 +586,10 @@ public class HomeFragment extends Fragment implements
         try {
 //            SmsManager smsManager = SmsManager.getDefault();
             String[] separated = phone.split(",");
+
+            //log phones
+            Log.d("TEST PHONES:", String.valueOf(separated));
+
             for (String num : separated) {
                 smsManager.sendTextMessage(num, null, "Help! I fear for my life!\n My location is \n "+ Uri.parse(geo)+ " \n Send help!\n -" + prefs.getString("UserName", "")+"\n\n- Sent from StrangerDanger App", null, null);
             }

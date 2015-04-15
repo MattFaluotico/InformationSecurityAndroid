@@ -1,6 +1,6 @@
 package claudiusmbemba.com.strangerdanger;
 
-import android.app.ListFragment;
+import android.app.Fragment;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -20,7 +20,7 @@ import static android.widget.AdapterView.OnItemClickListener;
 /**
  * Created by ClaudiusThaBeast on 4/10/15.
  */
-public class AddContactFragment extends ListFragment implements View.OnClickListener, OnItemClickListener {
+public class AddContactFragment extends Fragment implements View.OnClickListener, OnItemClickListener {
 
     public AddContactFragment() {
         //empty constructor
@@ -63,15 +63,15 @@ public class AddContactFragment extends ListFragment implements View.OnClickList
 
         String contact1,contact2,contact3,contact4,contact5;
 
-        contact1 = (prefs.getString("name_1", "").matches("")? "Click to add contact" : prefs.getString("name_1", "") );
-        contact2 = (prefs.getString("name_2", "").matches("")? "Click to add contact" : prefs.getString("name_2", "") );
-        contact3 = (prefs.getString("name_3", "").matches("")? "Click to add contact" : prefs.getString("name_3", "") );
-        contact4 = (prefs.getString("name_4", "").matches("")? "Click to add contact" : prefs.getString("name_4", "") );
-        contact5 = (prefs.getString("name_5", "").matches("")? "Click to add contact" : prefs.getString("name_5", "") );
+        contact1 = (prefs.getString("name_0", "").matches("")? "Click to add contact" : prefs.getString("name_0", "") );
+        contact2 = (prefs.getString("name_1", "").matches("")? "Click to add contact" : prefs.getString("name_1", "") );
+        contact3 = (prefs.getString("name_2", "").matches("")? "Click to add contact" : prefs.getString("name_2", "") );
+        contact4 = (prefs.getString("name_3", "").matches("")? "Click to add contact" : prefs.getString("name_3", "") );
+        contact5 = (prefs.getString("name_4", "").matches("")? "Click to add contact" : prefs.getString("name_4", "") );
 
         String[] ICEs = new String[]{contact1,contact2,contact3,contact4,contact5};
 
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this.getActivity(), R.layout.fragment_add, ICEs);
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this.getActivity(), android.R.layout.simple_list_item_1, ICEs);
         contacts.setAdapter(adapter);
         contacts.setOnItemClickListener(this);
 
@@ -116,6 +116,9 @@ public class AddContactFragment extends ListFragment implements View.OnClickList
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
         contact_id = position;
+
+//        Log.d("POSITION", String.valueOf(position));
+//        Log.d("ID", String.valueOf(id));
 
         //enable edit options
         name.setEnabled(true);
