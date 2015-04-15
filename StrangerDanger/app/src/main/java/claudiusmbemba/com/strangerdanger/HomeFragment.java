@@ -131,7 +131,7 @@ public class HomeFragment extends Fragment implements
 
         email = prefs.getString("emailAddress", "");
         pass = prefs.getString("emailPass", "");
-        
+
         //set UserName
         TextView username = (TextView) this.getActivity().findViewById(R.id.userName);
 
@@ -492,12 +492,16 @@ public class HomeFragment extends Fragment implements
         String recipients = prefs.getString("emails", "");
 
         if(smsPref){
+            if(!phones.matches("")) {
 //                notifySMS(phones, getLat(), getLng());
-            notifySMS("7406410248", getLat(), getLng());
+                notifySMS("7406410248", getLat(), getLng());
+            }
         }
         if(emailPref){
-//            notifyEmial(recipients, getLat(), getLng());
-            notifyEmial("mbemba.1@osu.edu", getLat(), getLng());
+            if(!recipients.matches("")) {
+//            notifyEmail(recipients, getLat(), getLng());
+                notifyEmail("mbemba.1@osu.edu", getLat(), getLng());
+            }
         }
     }
 
@@ -611,14 +615,14 @@ public class HomeFragment extends Fragment implements
     }
 
     //EMAIL related code
-    public void notifyEmial(String recipients, String lat, String lng) {
+    public void notifyEmail(String recipients, String lat, String lng) {
 
         if(email.matches("") || pass.matches("")){
             Toast.makeText(this.getActivity(), "Please enter email info in Preferences", Toast.LENGTH_LONG).show();
         }else {
 
-//            GMailSender sender = new GMailSender(email, pass);
-            GMailSender sender = new GMailSender("mbembac@gmail.com", "C0nfirmoceanhornadmin!");
+            GMailSender sender = new GMailSender(email, pass);
+//            GMailSender sender = new GMailSender("mbembac@gmail.com", "C0nfirmoceanhornadmin!");
 
             new SendMailTask().execute(sender);
 
@@ -734,7 +738,7 @@ public class HomeFragment extends Fragment implements
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            progressDialog = ProgressDialog.show(getActivity(), "Please wait", "Sending mail", true, false);
+            progressDialog = ProgressDialog.show(getActivity(), "Sending Emails", "Please wait...", true, false);
         }
 
         @Override
