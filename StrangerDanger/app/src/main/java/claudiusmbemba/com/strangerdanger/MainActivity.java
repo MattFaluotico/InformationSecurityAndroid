@@ -30,7 +30,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
@@ -291,6 +290,10 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
             public void onDrawerOpened(View drawerView) {
                 super.onDrawerOpened(drawerView);
 
+                if(prefs.getBoolean("alert_checked", false)){
+                    checkForLocationAlert();
+                }
+
                 invalidateOptionsMenu();
             }
 
@@ -322,11 +325,10 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
     }
 
 
-
     /*
-* Called when a particular item from the navigation drawer
-* is selected.
-* */
+    * Called when a particular item from the navigation drawer
+    * is selected.
+    */
     private void selectItemFromDrawer(int position) {
 
         NavItem item = mNavItems.get(position);
@@ -426,10 +428,7 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
 
     // Called when invalidateOptionsMenu() is invoked
     public boolean onPrepareOptionsMenu(Menu menu) {
-        if(prefs.getBoolean("alert_checked", false)){
-            checkForLocationAlert();
-        }
-// If the nav drawer is open, hide action items related to the content view
+        // If the nav drawer is open, hide action items related to the content view
         boolean drawerOpen = mDrawerLayout.isDrawerOpen(mDrawerPane);
         menu.findItem(R.id.action_settings).setVisible(!drawerOpen);
         return super.onPrepareOptionsMenu(menu);
@@ -439,6 +438,11 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
     protected void onPostCreate(Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
         mDrawerToggle.syncState();
+    }
+
+    @Override
+    protected void onPostResume() {
+        super.onPostResume();
     }
 
     @Override

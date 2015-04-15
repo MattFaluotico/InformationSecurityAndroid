@@ -167,10 +167,15 @@ public class HomeFragment extends Fragment implements
     public void onStart() {
         super.onStart();
         locationClient.connect();
-
+        Handler handler = new Handler();
         //determine if gps is enabled
         if (!manager.isProviderEnabled(LocationManager.GPS_PROVIDER)){
             gpsEnabledNotification();
+
+            if(prefs.getBoolean("alert_checked", false)){
+                ((MainActivity)getActivity()).checkForLocationAlert();
+            }
+
         }
     }
 
@@ -198,6 +203,7 @@ public class HomeFragment extends Fragment implements
         currentLocation = getLocation();
         startPeriodicUpdates();
     }
+
     /*
     * Get the current location
     */
@@ -278,16 +284,18 @@ public class HomeFragment extends Fragment implements
     public void onLocationChanged(Location location) {
 //        String msg = "Update location: " + Double.toString(location.getLatitude()) + ", " + Double.toString(location.getLongitude());
 //        Toast.makeText(this.getActivity(), msg, Toast.LENGTH_LONG).show();
-        double lat1 = currentLocation.getLatitude();
-        double lng1 = currentLocation.getLongitude();
+        if(lastLocation != null){
+            double lat1 = lastLocation.getLatitude();
+            double lng1 = lastLocation.getLongitude();
 
-        double lat2 = location.getLatitude();
-        double lng2 = location.getLongitude();
+            double lat2 = location.getLatitude();
+            double lng2 = location.getLongitude();
 
-        // lat1 and lng1 are the values of a previously stored location
-        if (distance(lat1, lng1, lat2, lng2) > 0.3) { // if distance > 1 miles we take locations as equal
-            //do what you want to do...
-            ((MainActivity)getActivity()).checkForLocationAlert();
+            // lat1 and lng1 are the values of a previously stored location
+            if (distance(lat1, lng1, lat2, lng2) > 0.3) { // if distance > 1 miles we take locations as equal
+                //do what you want to do...
+                ((MainActivity)getActivity()).checkForLocationAlert();
+            }
         }
         currentLocation = location;
 
@@ -351,7 +359,8 @@ public class HomeFragment extends Fragment implements
     }
 
     public Boolean checkGPSenabled(){
-        if(manager.isProviderEnabled(LocationManager.GPS_PROVIDER) || manager != null){
+//        if(manager.isProviderEnabled(LocationManager.GPS_PROVIDER) || manager != null){
+        if(manager.isProviderEnabled(LocationManager.GPS_PROVIDER)){
             return true;
         }else{
             return false;
@@ -593,7 +602,6 @@ public class HomeFragment extends Fragment implements
             e.printStackTrace();
         }
     }
-
 
 
     //EMAIL related code
