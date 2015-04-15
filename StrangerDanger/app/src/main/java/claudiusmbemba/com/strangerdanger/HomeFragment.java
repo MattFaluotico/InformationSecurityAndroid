@@ -44,11 +44,12 @@ public class HomeFragment extends Fragment implements
         //empty constructor
     }
 
-    Button notify;
-    Context context;
-    MediaPlayer siren;
-    MediaPlayer leedle;
-    SharedPreferences prefs;
+    private Button notify;
+    private Context context;
+    private MediaPlayer siren;
+//    private MediaPlayer leedle;
+    private SharedPreferences prefs;
+    private ImageButton siren_btn;
 
     private final static int CONNECTION_FAILURE_RESOLUTION_REQUEST = 9000;
 
@@ -104,8 +105,6 @@ public class HomeFragment extends Fragment implements
 
     private LocationManager manager = null;
 
-    ImageButton siren_btn;
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -113,7 +112,7 @@ public class HomeFragment extends Fragment implements
         context = this.getActivity();
 
         siren = MediaPlayer.create(context, R.raw.siren);
-        leedle = MediaPlayer.create(context, R.raw.leedle);
+//        leedle = MediaPlayer.create(context, R.raw.leedle);
 
         View view = inflater.inflate(R.layout.fragment_home, container, false);
         notify = (Button) view.findViewById(R.id.danger_button);
@@ -360,7 +359,7 @@ public class HomeFragment extends Fragment implements
 
     public Boolean checkGPSenabled(){
 //        if(manager.isProviderEnabled(LocationManager.GPS_PROVIDER) || manager != null){
-        if(manager.isProviderEnabled(LocationManager.GPS_PROVIDER)){
+        if(manager.isProviderEnabled(LocationManager.GPS_PROVIDER) && manager != null){
             return true;
         }else{
             return false;
@@ -562,13 +561,13 @@ public class HomeFragment extends Fragment implements
 //    };
 
     //SMS related code
-    SmsManager smsManager = SmsManager.getDefault();
+    private SmsManager smsManager = SmsManager.getDefault();
 
     public void notifySMS(String phone, String lat, String lng) {
 
         String geo ="http://maps.google.com/maps?daddr="+lat+","+lng;
         try {
-            SmsManager smsManager = SmsManager.getDefault();
+//            SmsManager smsManager = SmsManager.getDefault();
             String[] separated = phone.split(",");
             for (String num : separated) {
                 smsManager.sendTextMessage(num, null, "Help! I fear for my life!\n My location is \n "+ Uri.parse(geo)+ " \n Send help!\n -" + prefs.getString("UserName", "")+"\n\n- Sent from StrangerDanger App", null, null);
@@ -583,12 +582,11 @@ public class HomeFragment extends Fragment implements
         }
     }
 
-
     public void notifyAttack(String phone, String lat, String lng) {
 
         String geo ="http://maps.google.com/maps?daddr="+lat+","+lng;
         try {
-            SmsManager smsManager = SmsManager.getDefault();
+//            SmsManager smsManager = SmsManager.getDefault();
             String[] separated = phone.split(",");
             for (String num : separated) {
                 smsManager.sendTextMessage(num, null, "HELP!!! I'm being attacked! Call 9-1-1.\n My location is \n "+ Uri.parse(geo)+ "\n -"+prefs.getString("UserName", "")+" \n\n- Sent from StrangerDanger App", null, null);
@@ -602,7 +600,6 @@ public class HomeFragment extends Fragment implements
             e.printStackTrace();
         }
     }
-
 
     //EMAIL related code
     public void notifyEmial(String recipients, String lat, String lng) {

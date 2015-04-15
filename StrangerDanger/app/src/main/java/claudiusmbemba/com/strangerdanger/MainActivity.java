@@ -106,7 +106,7 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
         senSensorManager.registerListener(this, senAccelerometer, SensorManager.SENSOR_DELAY_NORMAL);
     }
 
-    class NavItem {
+    protected class NavItem {
         String mTitle;
         String mSubtitle;
         int mIcon;
@@ -118,7 +118,7 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
         }
     }
 
-    class DrawerListAdapter extends BaseAdapter {
+    protected class DrawerListAdapter extends BaseAdapter {
 
         Context mContext;
         ArrayList<NavItem> mNavItems;
@@ -169,16 +169,16 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
 
     private static String TAG = MainActivity.class.getSimpleName();
 
-    Context context;
-    ListView mDrawerList;
-    RelativeLayout mDrawerPane;
+    private Context context;
+    private ListView mDrawerList;
+    private RelativeLayout mDrawerPane;
     private ActionBarDrawerToggle mDrawerToggle;
     private DrawerLayout mDrawerLayout;
     private Fragment fragment = null;
     private HomeFragment home;
 
-    SharedPreferences prefs;
-    ArrayList<NavItem> mNavItems = new ArrayList<NavItem>();
+    private SharedPreferences prefs;
+    private ArrayList<NavItem> mNavItems = new ArrayList<NavItem>();
 
     //camera intents
     private static final int CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE = 100;
@@ -231,7 +231,6 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
 //            photoImage.setImageDrawable(drawable);
 //        }
 //    }
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -324,7 +323,6 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
         }
     }
 
-
     /*
     * Called when a particular item from the navigation drawer
     * is selected.
@@ -414,7 +412,6 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
         }
     }
 
-
     public boolean isConnected(){
         ConnectivityManager connMgr = (ConnectivityManager) getSystemService(Activity.CONNECTIVITY_SERVICE);
         NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
@@ -424,7 +421,6 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
             return false;
         }
     }
-
 
     // Called when invalidateOptionsMenu() is invoked
     public boolean onPrepareOptionsMenu(Menu menu) {
@@ -479,10 +475,14 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
     public void checkForLocationAlert() {
         if(prefs.getBoolean("alerts", false)) {
             if (home.checkGPSenabled()) {
-//        if(true){
-                // call AsynTask to perform network operation on separate thread
+                if(isConnected()){
+                    //        if(true){
+                    // call AsynTask to perform network operation on separate thread
 //        new HttpAsyncTask().execute("https://maps.googleapis.com/maps/api/place/search/json?location=37.785835,-122.406418&rankby=distance&types=police&sensor=false&key=AIzaSyCU7rZMOqBsI87fpoZBSIxQPs0A9yLK6k0");
-                new HttpAsyncTask().execute("http://api.spotcrime.com/crimes.json?lat=" + home.getLat() + "&lon=" + home.getLng() + "&radius=0.050&callback=&key=MLC-restricted-key");
+                    new HttpAsyncTask().execute("http://api.spotcrime.com/crimes.json?lat=" + home.getLat() + "&lon=" + home.getLng() + "&radius=0.050&callback=&key=MLC-restricted-key");
+                }else{
+                    Toast.makeText(this, "No network or wifi available", Toast.LENGTH_LONG).show();
+                }
                 //0-10: Low crime
                 //11-30: Med crime
                 //31+: high crime
@@ -549,6 +549,7 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
 
         return result;
     }
+
     //MAKE GET REQUESTS
     private class HttpAsyncTask extends AsyncTask<String, Void, String> {
         @Override

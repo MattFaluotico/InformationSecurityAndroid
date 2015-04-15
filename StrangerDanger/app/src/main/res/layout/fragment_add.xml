@@ -18,28 +18,28 @@
             android:layout_height="match_parent"
             android:orientation="vertical">
             <!--title-->
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="0.1"
-               >
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Contacts"
-                    android:id="@+id/contact_label"
-                    android:layout_alignParentTop="true"
-                    android:layout_centerHorizontal="true"
-                    android:layout_centerInParent="true"
-                    android:layout_centerVertical="true"
-                    android:textSize="35sp"
-                    android:paddingLeft="10dp"/>
-            </RelativeLayout>
+            <!--<RelativeLayout-->
+                <!--android:layout_width="match_parent"-->
+                <!--android:layout_height="0dp"-->
+                <!--android:layout_weight="0.1"-->
+               <!-->-->
+                <!--<TextView-->
+                    <!--android:layout_width="match_parent"-->
+                    <!--android:layout_height="wrap_content"-->
+                    <!--android:text="Contacts"-->
+                    <!--android:id="@+id/contact_label"-->
+                    <!--android:layout_alignParentTop="true"-->
+                    <!--android:layout_centerHorizontal="true"-->
+                    <!--android:layout_centerInParent="true"-->
+                    <!--android:layout_centerVertical="true"-->
+                    <!--android:textSize="35sp"-->
+                    <!--android:paddingLeft="10dp"/>-->
+            <!--</RelativeLayout>-->
             <!--contact list-->
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                android:layout_weight="0.5"
+                android:layout_weight="0.6"
                 android:layout_margin="10dp">
                 <TextView
                     android:layout_width="match_parent"
@@ -48,7 +48,7 @@
                     android:id="@+id/contacts_view"
                     android:layout_alignParentTop="true"
                     android:layout_centerHorizontal="true"
-                    android:textSize="10sp"/>
+                    android:textSize="12sp"/>
             </RelativeLayout>
 
         </LinearLayout>

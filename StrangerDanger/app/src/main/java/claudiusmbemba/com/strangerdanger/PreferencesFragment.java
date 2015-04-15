@@ -22,14 +22,14 @@ public class PreferencesFragment extends Fragment implements View.OnClickListene
         // Required empty public constructor
     }
 
-    CheckBox sms;
-    CheckBox email;
-    CheckBox alerts;
-    Button save;
-    View email_cred;
-    EditText emailAddress;
-    EditText emailPass;
-    EditText userName;
+    private CheckBox sms;
+    private CheckBox email;
+    private CheckBox alerts;
+    private Button save;
+    private View email_cred;
+    private EditText emailAddress;
+    private EditText emailPass;
+    private EditText userName;
 
     SharedPreferences prefs;
     @Override

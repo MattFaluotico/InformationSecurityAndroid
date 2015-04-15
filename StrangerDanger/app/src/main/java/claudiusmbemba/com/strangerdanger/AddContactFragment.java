@@ -22,16 +22,18 @@ public class AddContactFragment extends Fragment implements View.OnClickListener
         //empty constructor
     }
 
-    Button btn;
-    TextView contacts;
-    EditText name;
-    EditText phone;
-    EditText email;
-    SharedPreferences prefs;
-    String names = null;
-    String phones = null;
-    String emails = null;
-    String[] allNames = null;
+    private Button btn;
+    private TextView contacts;
+    private EditText name;
+    private EditText phone;
+    private EditText email;
+    private SharedPreferences prefs;
+    private String names = null;
+    private String phones = null;
+    private String emails = null;
+    private String[] allNames = null;
+    private String[] allPhones = null;
+    private String[] allEmails = null;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -57,8 +59,6 @@ public class AddContactFragment extends Fragment implements View.OnClickListener
         emails = prefs.getString("emails", "");
 
         if(!names.matches("")){
-            String[] allPhones = null;
-            String[] allEmails = null;
 
             if (!names.matches("")) {
                 allNames = names.split(",");
@@ -114,14 +114,14 @@ public class AddContactFragment extends Fragment implements View.OnClickListener
                     phones += (phones.matches(""))? phone.getText():","+phone.getText();
                     emails += (emails.matches(""))? email.getText():","+email.getText();
 
-                    prefs.edit().putString("names", names).putString("phones", phones).putString("emails", emails).commit();
+                    prefs.edit().putString("names", names).putString("phones", phones).putString("emails", emails).apply();
 
 //                if (TextUtils.isEmpty(phone.getText().toString())) {
 //                    contacts.setText(contacts.getText().toString() + "\n" + name.getText().toString() + "\n" + email.getText().toString() + "\n");
 //                } else if (TextUtils.isEmpty(email.getText().toString())) {
 //                    contacts.setText(contacts.getText().toString() + "\n" + name.getText().toString() + "\n" + phone.getText().toString() + "\n");
 //                } else {
-                    contacts.setText(contacts.getText().toString() + name.getText().toString() + "\n" + phone.getText().toString() + "\n" + email.getText().toString() + "\n");
+                    contacts.setText(contacts.getText().toString() + "\n" + name.getText().toString() + "\n" + phone.getText().toString() + "\n" + email.getText().toString() + "\n");
 //                }
 
                     name.setText("");
