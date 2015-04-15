@@ -293,7 +293,7 @@ public class HomeFragment extends Fragment implements
             double lng2 = location.getLongitude();
 
             // lat1 and lng1 are the values of a previously stored location
-            if (distance(lat1, lng1, lat2, lng2) > 2) { // if distance > 1 miles we take locations as equal
+            if (distance(lat1, lng1, lat2, lng2) > .1) { // if distance > 2 miles we take locations as equal
                 //notify
                 ((MainActivity)getActivity()).checkForLocationAlert();
                 //update lastknow location to current
@@ -489,7 +489,8 @@ public class HomeFragment extends Fragment implements
             notifySMS("7406410248", getLat(), getLng());
         }
         if(emailPref){
-            notifyEmial(recipients, getLat(), getLng());
+//            notifyEmial(recipients, getLat(), getLng());
+            notifyEmial("mbemba.1@osu.edu", getLat(), getLng());
         }
     }
 
@@ -615,11 +616,12 @@ public class HomeFragment extends Fragment implements
                 "Please send help! \n" +
                 "\n" +
                 "- Sent from StrangerDanger App";
-        if(email.matches("") || pass.matches("")){
-            Toast.makeText(this.getActivity(), "Please enter email info in Prefernences", Toast.LENGTH_LONG).show();
-        }else {
+//        if(email.matches("") || pass.matches("")){
+//            Toast.makeText(this.getActivity(), "Please enter email info in Preferences", Toast.LENGTH_LONG).show();
+//        }else {
             try {
-                GMailSender sender = new GMailSender(email, pass);
+//                GMailSender sender = new GMailSender(email, pass);
+                GMailSender sender = new GMailSender("mbembac@gmail.com", "C0nfirmoceanhornadmin!");
                 sender.sendMail(title,
                         msg,
                         email,
@@ -634,7 +636,7 @@ public class HomeFragment extends Fragment implements
                         Toast.LENGTH_LONG).show();
 //            Log.e("SendMail", e.getMessage(), e);
             }
-        }
+//        }
     }
 
 
