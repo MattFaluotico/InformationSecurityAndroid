@@ -41,14 +41,19 @@
                 android:layout_height="0dp"
                 android:layout_weight="0.6"
                 android:layout_margin="10dp">
-                <TextView
+                <!--<TextView-->
+                    <!--android:layout_width="match_parent"-->
+                    <!--android:layout_height="match_parent"-->
+                    <!--android:text=""-->
+                    <!--android:id="@+id/contacts_view"-->
+                    <!--android:layout_alignParentTop="true"-->
+                    <!--android:layout_centerHorizontal="true"-->
+                    <!--android:textSize="12sp"/>-->
+
+                <ListView
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:text=""
-                    android:id="@+id/contacts_view"
-                    android:layout_alignParentTop="true"
-                    android:layout_centerHorizontal="true"
-                    android:textSize="12sp"/>
+                    android:id="@+id/list" />
             </RelativeLayout>
 
         </LinearLayout>

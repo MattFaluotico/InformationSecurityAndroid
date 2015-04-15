@@ -1,6 +1,6 @@
 package claudiusmbemba.com.strangerdanger;
 
-import android.app.Fragment;
+import android.app.ListFragment;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -8,32 +8,31 @@ import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.TextView;
+import android.widget.ListView;
 import android.widget.Toast;
+
+import static android.widget.AdapterView.OnItemClickListener;
 
 /**
  * Created by ClaudiusThaBeast on 4/10/15.
  */
-public class AddContactFragment extends Fragment implements View.OnClickListener {
+public class AddContactFragment extends ListFragment implements View.OnClickListener, OnItemClickListener {
 
     public AddContactFragment() {
         //empty constructor
     }
 
-    private Button btn;
-    private TextView contacts;
+    private Button save_btn;
     private EditText name;
     private EditText phone;
     private EditText email;
     private SharedPreferences prefs;
-    private String names = null;
-    private String phones = null;
-    private String emails = null;
-    private String[] allNames = null;
-    private String[] allPhones = null;
-    private String[] allEmails = null;
+    ListView contacts;
+    private int contact_id;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -45,43 +44,36 @@ public class AddContactFragment extends Fragment implements View.OnClickListener
 
         prefs = this.getActivity().getSharedPreferences("claudiusmbemba.com.strangerdanger", Context.MODE_PRIVATE);
 
-        contacts = (TextView) view.findViewById(R.id.contacts_view);
+        contacts = (ListView) view.findViewById(R.id.list);
 
-        btn = (Button) view.findViewById(R.id.save_contact);
-        btn.setOnClickListener(this);
+        save_btn = (Button) view.findViewById(R.id.save_contact);
+        save_btn.setOnClickListener(this);
 
         name = (EditText) view.findViewById(R.id.name_text);
-        name.requestFocus();
+        phone = (EditText) view.findViewById(R.id.phone_text);
+        email = (EditText) view.findViewById(R.id.email_text);
 
+        //disable editTexts until user clicks a individual item
+        name.setEnabled(false);
+        phone.setEnabled(false);
+        email.setEnabled(false);
+        save_btn.setEnabled(false);
 
-        names = prefs.getString("names", "");
-        phones = prefs.getString("phones", "");
-        emails = prefs.getString("emails", "");
+        contacts.requestFocus();
 
-        if(!names.matches("")){
+        String contact1,contact2,contact3,contact4,contact5;
 
-            if (!names.matches("")) {
-                allNames = names.split(",");
-            }
-            if (!phones.matches("")) {
-                allPhones = phones.split(",");
-            }
-            if (!emails.matches("")) {
-                allEmails = emails.split(",");
-            }
+        contact1 = (prefs.getString("name_1", "").matches("")? "Click to add contact" : prefs.getString("name_1", "") );
+        contact2 = (prefs.getString("name_2", "").matches("")? "Click to add contact" : prefs.getString("name_2", "") );
+        contact3 = (prefs.getString("name_3", "").matches("")? "Click to add contact" : prefs.getString("name_3", "") );
+        contact4 = (prefs.getString("name_4", "").matches("")? "Click to add contact" : prefs.getString("name_4", "") );
+        contact5 = (prefs.getString("name_5", "").matches("")? "Click to add contact" : prefs.getString("name_5", "") );
 
-            String cont = "";
-            for (int i = 0; i <= allNames.length-1; i++) {
-                cont += allNames[i] + "\n" + allPhones[i] + "\n" + allEmails[i]+"\n\n";
-            }
+        String[] ICEs = new String[]{contact1,contact2,contact3,contact4,contact5};
 
-            contacts.setText(cont);
-
-            if(allNames.length >= 5){
-                btn.setEnabled(false);
-            }
-
-        }
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this.getActivity(), R.layout.fragment_add, ICEs);
+        contacts.setAdapter(adapter);
+        contacts.setOnItemClickListener(this);
 
         // Inflate the layout for this fragment
 //        return inflater.inflate(R.layout.fragment_add, container, false);
@@ -91,51 +83,56 @@ public class AddContactFragment extends Fragment implements View.OnClickListener
 
     @Override
     public void onClick(View v) {
-
-//        save(v);
-//        Toast.makeText(this.getActivity(),
-//                "Button is clicked!", Toast.LENGTH_LONG).show();
-        contacts = (TextView) getActivity().findViewById(R.id.contacts_view);
-//        Button save = (Button) getActivity().findViewById(R.id.save_contact);
-        name = (EditText) getActivity().findViewById(R.id.name_text);
-        phone = (EditText) getActivity().findViewById(R.id.phone_text);
-        email = (EditText) getActivity().findViewById(R.id.email_text);
+        String contact_num = String.valueOf(contact_id);
 
         if (!TextUtils.isEmpty(name.getText().toString())) {
 
             if (TextUtils.isEmpty(phone.getText().toString()) || TextUtils.isEmpty(email.getText().toString())) {
-                Toast.makeText(this.getActivity(), "Please add contacts phone # and email", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this.getActivity(), "Please add contact's phone # and email", Toast.LENGTH_SHORT).show();
             } else {
+
                 //save contact to preferences
-                names += (names.matches(""))? name.getText(): ","+name.getText();
-                String[] nameCount = names.split(",");
+                prefs.edit().putString("name_"+contact_num, name.getText().toString()).putString("phone_"+contact_num, phone.getText().toString()).putString("email_"+contact_num, email.getText().toString()).apply();
 
-                if(nameCount.length <= 5){
-                    phones += (phones.matches(""))? phone.getText():","+phone.getText();
-                    emails += (emails.matches(""))? email.getText():","+email.getText();
+                //clear fields
+                name.setText("");
+                phone.setText("");
+                email.setText("");
 
-                    prefs.edit().putString("names", names).putString("phones", phones).putString("emails", emails).apply();
+                Toast.makeText(this.getActivity(), "Contact saved!", Toast.LENGTH_SHORT).show();
 
-//                if (TextUtils.isEmpty(phone.getText().toString())) {
-//                    contacts.setText(contacts.getText().toString() + "\n" + name.getText().toString() + "\n" + email.getText().toString() + "\n");
-//                } else if (TextUtils.isEmpty(email.getText().toString())) {
-//                    contacts.setText(contacts.getText().toString() + "\n" + name.getText().toString() + "\n" + phone.getText().toString() + "\n");
-//                } else {
-                    contacts.setText(contacts.getText().toString() + "\n" + name.getText().toString() + "\n" + phone.getText().toString() + "\n" + email.getText().toString() + "\n");
-//                }
-
-                    name.setText("");
-                    phone.setText("");
-                    email.setText("");
-
-                    Toast.makeText(this.getActivity(), "Contact saved!", Toast.LENGTH_SHORT).show();
-                }else{
-                    Toast.makeText(this.getActivity(), "Reached max of 5 contacts saved!", Toast.LENGTH_SHORT).show();
-                    btn.setEnabled(false);
-                }
+                //disable edit options
+                name.setEnabled(false);
+                phone.setEnabled(false);
+                email.setEnabled(false);
+                save_btn.setEnabled(false);
             }
         } else {
             Toast.makeText(this.getActivity(), "Please add a contact before saving", Toast.LENGTH_SHORT).show();
         }
     }
+
+    @Override
+    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+        contact_id = position;
+
+        //enable edit options
+        name.setEnabled(true);
+        phone.setEnabled(true);
+        email.setEnabled(true);
+        save_btn.setEnabled(true);
+
+        name.requestFocus();
+
+        String contact_id = String.valueOf(position);
+
+        String person = prefs.getString("name_"+contact_id, "");
+        if(!person.matches("")){
+            name.setText(person);
+            phone.setText(prefs.getString("phone_"+contact_id, ""));
+            email.setText(prefs.getString("email_"+contact_id, ""));
+        }
+    }
+
 }

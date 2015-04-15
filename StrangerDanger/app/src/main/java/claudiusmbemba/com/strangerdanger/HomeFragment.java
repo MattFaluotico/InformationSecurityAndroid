@@ -499,8 +499,12 @@ public class HomeFragment extends Fragment implements
         }
         if(emailPref){
             if(!recipients.matches("")) {
+                if(((MainActivity)getActivity()).isConnected()) {
 //            notifyEmail(recipients, getLat(), getLng());
-                notifyEmail("mbemba.1@osu.edu", getLat(), getLng());
+                    notifyEmail("mbemba.1@osu.edu", getLat(), getLng());
+                }else{
+                    Toast.makeText(this.getActivity(), "Cannot notify via email.\nNo network or wifi available.", Toast.LENGTH_LONG).show();
+                }
             }
         }
     }

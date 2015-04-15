@@ -481,7 +481,7 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
 //        new HttpAsyncTask().execute("https://maps.googleapis.com/maps/api/place/search/json?location=37.785835,-122.406418&rankby=distance&types=police&sensor=false&key=AIzaSyCU7rZMOqBsI87fpoZBSIxQPs0A9yLK6k0");
                     new HttpAsyncTask().execute("http://api.spotcrime.com/crimes.json?lat=" + home.getLat() + "&lon=" + home.getLng() + "&radius=0.050&callback=&key=MLC-restricted-key");
                 }else{
-                    Toast.makeText(this, "No network or wifi available", Toast.LENGTH_LONG).show();
+                    Toast.makeText(this, "No network or wifi available.\nPlease enable.", Toast.LENGTH_LONG).show();
                 }
                 //0-10: Low crime
                 //11-30: Med crime
