@@ -52,8 +52,8 @@ public class HomeFragment extends Fragment implements
     //    private MediaPlayer leedle;
     private SharedPreferences prefs;
     private ImageButton siren_btn;
-    private String email = prefs.getString("emailAddress", "");
-    private String pass = prefs.getString("emailPass", "");
+    private String email;
+    private String pass;
 
     private final static int CONNECTION_FAILURE_RESOLUTION_REQUEST = 9000;
 
@@ -129,6 +129,8 @@ public class HomeFragment extends Fragment implements
 
         prefs = this.getActivity().getSharedPreferences("claudiusmbemba.com.strangerdanger", Context.MODE_PRIVATE);
 
+        email = prefs.getString("emailAddress", "");
+        pass = prefs.getString("emailPass", "");
         //set UserName
         TextView username = (TextView) this.getActivity().findViewById(R.id.userName);
 
