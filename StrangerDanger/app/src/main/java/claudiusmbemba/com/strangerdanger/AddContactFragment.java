@@ -61,6 +61,15 @@ public class AddContactFragment extends Fragment implements View.OnClickListener
 
         contacts.requestFocus();
 
+        populate_listView();
+        contacts.setOnItemClickListener(this);
+
+        // Inflate the layout for this fragment
+//        return inflater.inflate(R.layout.fragment_add, container, false);
+        return view;
+    }
+
+    private void populate_listView() {
         String contact1,contact2,contact3,contact4,contact5;
 
         contact1 = (prefs.getString("name_0", "").matches("")? "Click to add contact" : prefs.getString("name_0", "") );
@@ -73,11 +82,6 @@ public class AddContactFragment extends Fragment implements View.OnClickListener
 
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(this.getActivity(), android.R.layout.simple_list_item_1, ICEs);
         contacts.setAdapter(adapter);
-        contacts.setOnItemClickListener(this);
-
-        // Inflate the layout for this fragment
-//        return inflater.inflate(R.layout.fragment_add, container, false);
-        return view;
     }
 
 
@@ -106,6 +110,9 @@ public class AddContactFragment extends Fragment implements View.OnClickListener
                 phone.setEnabled(false);
                 email.setEnabled(false);
                 save_btn.setEnabled(false);
+
+                //refresh listView
+                populate_listView();
             }
         } else {
             Toast.makeText(this.getActivity(), "Please add a contact before saving", Toast.LENGTH_SHORT).show();
@@ -128,8 +135,14 @@ public class AddContactFragment extends Fragment implements View.OnClickListener
 
         name.requestFocus();
 
-        String contact_id = String.valueOf(position);
+        //clear fields
+        name.setText("");
+        phone.setText("");
+        email.setText("");
 
+
+        String contact_id = String.valueOf(position);
+        //set text fields
         String person = prefs.getString("name_"+contact_id, "");
         if(!person.matches("")){
             name.setText(person);

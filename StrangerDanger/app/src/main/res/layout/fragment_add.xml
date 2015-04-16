@@ -1,160 +1,136 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<LinearLayout
-    android:orientation="vertical"
+<ScrollView
+    android:layout_height="fill_parent"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    xmlns:android="http://schemas.android.com/apk/res/android">
-
-    <!--saved contacts-->
-    <RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:fillViewport="true">
+    <LinearLayout
+        android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="0.6"
-        android:id="@+id/save_contact_view">
+        android:layout_height="wrap_content">
 
-        <LinearLayout
+        <!--saved contacts List View-->
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical">
-            <!--title-->
-            <!--<RelativeLayout-->
-                <!--android:layout_width="match_parent"-->
-                <!--android:layout_height="0dp"-->
-                <!--android:layout_weight="0.1"-->
-               <!-->-->
-                <!--<TextView-->
-                    <!--android:layout_width="match_parent"-->
-                    <!--android:layout_height="wrap_content"-->
-                    <!--android:text="Contacts"-->
-                    <!--android:id="@+id/contact_label"-->
-                    <!--android:layout_alignParentTop="true"-->
-                    <!--android:layout_centerHorizontal="true"-->
-                    <!--android:layout_centerInParent="true"-->
-                    <!--android:layout_centerVertical="true"-->
-                    <!--android:textSize="35sp"-->
-                    <!--android:paddingLeft="10dp"/>-->
-            <!--</RelativeLayout>-->
-            <!--contact list-->
-            <RelativeLayout
+            android:layout_height="0dp"
+            android:layout_weight="0.2"
+            android:id="@+id/save_contact_view">
+
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="0.6"
-                android:layout_margin="10dp">
-                <!--<TextView-->
-                    <!--android:layout_width="match_parent"-->
-                    <!--android:layout_height="match_parent"-->
-                    <!--android:text=""-->
-                    <!--android:id="@+id/contacts_view"-->
-                    <!--android:layout_alignParentTop="true"-->
-                    <!--android:layout_centerHorizontal="true"-->
-                    <!--android:textSize="12sp"/>-->
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
 
-                <ListView
+                <!--contact list-->
+                <RelativeLayout
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:id="@+id/list" />
-            </RelativeLayout>
+                    android:layout_height="0dp"
+                    android:layout_weight="0.6"
+                    android:layout_margin="10dp">
 
-        </LinearLayout>
+                    <ListView
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:id="@+id/list" />
+                </RelativeLayout>
 
+            </LinearLayout>
 
-    </RelativeLayout>
+        </RelativeLayout>
 
-    <!--add contacts-->
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="0.3">
+        <!--add contacts-->
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
 
-        <LinearLayout
-            xmlns:android="http://schemas.android.com/apk/res/android"
-            android:orientation="horizontal"
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
-            android:weightSum="1">
-
-            <RelativeLayout
-                android:layout_width="102dp"
-                android:layout_height="match_parent"
-                android:layout_gravity="right"
-                android:paddingLeft="20dp"
-                android:paddingTop="10dp">
-
-                <TextView
-                    android:layout_width="wrap_content"
+            <LinearLayout
+                xmlns:android="http://schemas.android.com/apk/res/android"
+                android:orientation="horizontal"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true">
+                <!--labels-->
+                <RelativeLayout
+                    android:layout_width="102dp"
                     android:layout_height="wrap_content"
-                    android:textAppearance="?android:attr/textAppearanceMedium"
-                    android:text="Name:"
-                    android:id="@+id/name_label" />
+                    android:layout_gravity="right"
+                    android:paddingLeft="20dp"
+                    android:paddingTop="10dp">
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textAppearance="?android:attr/textAppearanceMedium"
-                    android:text="Phone:"
-                    android:id="@+id/phone_label"
-                    android:layout_below="@+id/name_label"
-                    android:layout_marginTop="15dp"/>
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="?android:attr/textAppearanceMedium"
+                        android:text="Name:"
+                        android:id="@+id/name_label" />
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textAppearance="?android:attr/textAppearanceMedium"
-                    android:text="Email:"
-                    android:id="@+id/email_label"
-                    android:layout_below="@+id/phone_label"
-                    android:layout_marginTop="15dp"/>
-            </RelativeLayout>
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="?android:attr/textAppearanceMedium"
+                        android:text="Phone:"
+                        android:id="@+id/phone_label"
+                        android:layout_below="@+id/name_label"
+                        android:layout_marginTop="15dp"/>
 
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:gravity="left"
-                android:layout_marginRight="20dp">
-
-                <EditText
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="?android:attr/textAppearanceMedium"
+                        android:text="Email:"
+                        android:id="@+id/email_label"
+                        android:layout_below="@+id/phone_label"
+                        android:layout_marginTop="15dp"/>
+                </RelativeLayout>
+                <!--editTexts-->
+                <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:id="@+id/name_text"
-                    android:hint="John Doe"/>
+                    android:gravity="left"
+                    android:layout_marginRight="10dp">
 
-                <EditText
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/phone_text"
-                    android:ems="10"
-                    android:inputType="phone"
-                    android:layout_below="@+id/name_text"
-                    android:hint="7406140243"/>
+                    <EditText
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/name_text"
+                        android:hint="John Doe"/>
 
-                <EditText
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/email_text"
-                    android:ems="10"
-                    android:inputType="textEmailAddress"
-                    android:layout_below="@+id/phone_text"
-                    android:hint="jdoe@gmail.com"/>
-            </RelativeLayout>
-        </LinearLayout>
-    </RelativeLayout>
+                    <EditText
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/phone_text"
+                        android:ems="10"
+                        android:inputType="phone"
+                        android:layout_below="@+id/name_text"
+                        android:hint="7406140243"/>
 
-    <!--save button-->
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="0.1">
+                    <EditText
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/email_text"
+                        android:ems="10"
+                        android:inputType="textEmailAddress"
+                        android:layout_below="@+id/phone_text"
+                        android:hint="jdoe@gmail.com"/>
+                </RelativeLayout>
+            </LinearLayout>
+        </RelativeLayout>
 
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Save Contact"
-            android:id="@+id/save_contact"
-            android:layout_alignParentTop="true"
-            android:layout_centerHorizontal="true"/>
+        <!--save button-->
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
 
-    </RelativeLayout>
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Save Contact"
+                android:id="@+id/save_contact"
+                android:layout_alignParentTop="true"
+                android:layout_centerHorizontal="true"/>
 
+        </RelativeLayout>
 
-</LinearLayout>
+    </LinearLayout>
+</ScrollView>
