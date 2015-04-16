@@ -26,7 +26,7 @@ public class PreferencesFragment extends Fragment implements View.OnClickListene
     private CheckBox email;
     private CheckBox alerts;
     private Button save;
-    private View email_cred;
+    //    private View email_cred;
     private EditText emailAddress;
     private EditText emailPass;
     private EditText userName;
@@ -46,9 +46,12 @@ public class PreferencesFragment extends Fragment implements View.OnClickListene
         save = (Button) view.findViewById(R.id.save_prefs);
         save.setOnClickListener(this);
 
-        email_cred = view.findViewById(R.id.email_credentials);
+//        email_cred = view.findViewById(R.id.email_credentials);
         emailAddress = (EditText) view.findViewById(R.id.email_cred_text);
         emailPass = (EditText) view.findViewById(R.id.email_pass_cred_text);
+
+        emailAddress.setText(prefs.getString("emailAddress", ""));
+        emailPass.setText(prefs.getString("emailPass", ""));
 
         userName = (EditText) view.findViewById(R.id.userName_text);
 
@@ -62,13 +65,11 @@ public class PreferencesFragment extends Fragment implements View.OnClickListene
         }
         if(prefs.getBoolean("email", false)){
             email.setChecked(true);
-            email_cred.setEnabled(true);
-            emailAddress.setText(prefs.getString("emailAddress", ""));
-            emailPass.setText(prefs.getString("emailPass", ""));
-
-        }else{
-            email_cred.setEnabled(false);
+//            email_cred.setEnabled(true);
         }
+//        else{
+//            email_cred.setEnabled(false);
+//        }
         if(prefs.getBoolean("alerts", false)){
             alerts.setChecked(true);
         }
@@ -89,7 +90,7 @@ public class PreferencesFragment extends Fragment implements View.OnClickListene
         String emailAdd = emailAddress.getText().toString();
         String pass = emailPass.getText().toString();
 
-        prefs.edit().putBoolean("sms", smsPref).putBoolean("email", emailPref).putBoolean("alerts", alertPref).putString("emailAddress", emailAdd).putString("emailPass", pass).putString("UserName", userName.getText().toString()).commit();
+        prefs.edit().putBoolean("sms", smsPref).putBoolean("email", emailPref).putBoolean("alerts", alertPref).putString("emailAddress", emailAdd).putString("emailPass", pass).putString("UserName", userName.getText().toString()).apply();
 
         Toast.makeText(this.getActivity(), "Changes saved!", Toast.LENGTH_LONG).show();
     }
