@@ -65,11 +65,8 @@ public class PreferencesFragment extends Fragment implements View.OnClickListene
         }
         if(prefs.getBoolean("email", false)){
             email.setChecked(true);
-//            email_cred.setEnabled(true);
         }
-//        else{
-//            email_cred.setEnabled(false);
-//        }
+
         if(prefs.getBoolean("alerts", false)){
             alerts.setChecked(true);
         }

@@ -140,7 +140,7 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
     private Sensor senAccelerometer;
     private long lastUpdate = 0;
     private float last_x, last_y, last_z;
-    private static final int SHAKE_THRESHOLD = 2000;
+    private static final int SHAKE_THRESHOLD = 5000;
 
     //ACCELEROMETER RELATED METHODS
     @Override
@@ -161,7 +161,6 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
                 float speed = Math.abs(x + y + z - last_x - last_y - last_z)/ diffTime * 10000;
 
                 if (speed > SHAKE_THRESHOLD) {
-//                    home.notifyAttack(prefs.getString("phones", ""),home.getLat(),home.getLng());
                     notifyAttack();
                 }
 
@@ -951,21 +950,23 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
         String phones = prefs.getString("phone_0", "");
         String recipients = prefs.getString("email_0", "");
 
+
         if(smsPref){
             if(!phones.matches("")) {
-//                notifySMS(phones, getLat(), getLng());
                 notifySMS();
             }
         }
         if(emailPref){
             if(!recipients.matches("")) {
                 if(isConnected()) {
-//            notifyEmail(recipients, getLat(), getLng());
                     notifyEmail();
                 }else{
                     Toast.makeText(context, "Cannot notify via email.\nNo network or wifi available.", Toast.LENGTH_LONG).show();
                 }
             }
+        }
+        if(!smsPref && !emailPref){
+            Toast.makeText(this, "Enable Notification options in Preferences", Toast.LENGTH_LONG).show();
         }
     }
 
@@ -979,11 +980,6 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
             if(message.matches("attack")){
                 notifyAttack();
             }
-//        if(notify != null ){
-//            if(notify.getStringExtra("notify").matches("attack")) {
-//                notifyAttack();
-//            }
-//        }
         }
     };
 
