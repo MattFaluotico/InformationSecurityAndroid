@@ -72,11 +72,11 @@ public class AddContactFragment extends Fragment implements View.OnClickListener
     private void populate_listView() {
         String contact1,contact2,contact3,contact4,contact5;
 
-        contact1 = (prefs.getString("name_0", "").matches("")? "Click to add contact" : prefs.getString("name_0", "") );
-        contact2 = (prefs.getString("name_1", "").matches("")? "Click to add contact" : prefs.getString("name_1", "") );
-        contact3 = (prefs.getString("name_2", "").matches("")? "Click to add contact" : prefs.getString("name_2", "") );
-        contact4 = (prefs.getString("name_3", "").matches("")? "Click to add contact" : prefs.getString("name_3", "") );
-        contact5 = (prefs.getString("name_4", "").matches("")? "Click to add contact" : prefs.getString("name_4", "") );
+        contact1 = (prefs.getString("name_0", "").matches("")? "Click to add contact 1" : prefs.getString("name_0", "") );
+        contact2 = (prefs.getString("name_1", "").matches("")? "Click to add contact 2" : prefs.getString("name_1", "") );
+        contact3 = (prefs.getString("name_2", "").matches("")? "Click to add contact 3" : prefs.getString("name_2", "") );
+        contact4 = (prefs.getString("name_3", "").matches("")? "Click to add contact 4" : prefs.getString("name_3", "") );
+        contact5 = (prefs.getString("name_4", "").matches("")? "Click to add contact 5" : prefs.getString("name_4", "") );
 
         String[] ICEs = new String[]{contact1,contact2,contact3,contact4,contact5};
 
@@ -89,33 +89,34 @@ public class AddContactFragment extends Fragment implements View.OnClickListener
     public void onClick(View v) {
         String contact_num = String.valueOf(contact_id);
 
-        if (!TextUtils.isEmpty(name.getText().toString())) {
+        if (!TextUtils.isEmpty(name.getText().toString()) && (TextUtils.isEmpty(phone.getText().toString()) || TextUtils.isEmpty(email.getText().toString())) ) {
 
-            if (TextUtils.isEmpty(phone.getText().toString()) || TextUtils.isEmpty(email.getText().toString())) {
-                Toast.makeText(this.getActivity(), "Please add contact's phone # and email", Toast.LENGTH_SHORT).show();
-            } else {
+            Toast.makeText(this.getActivity(), "Please add contact's phone # and email", Toast.LENGTH_SHORT).show();
 
-                //save contact to preferences
-                prefs.edit().putString("name_"+contact_num, name.getText().toString()).putString("phone_"+contact_num, phone.getText().toString()).putString("email_"+contact_num, email.getText().toString()).apply();
+        } else if(TextUtils.isEmpty(name.getText().toString()) && TextUtils.isEmpty(phone.getText().toString()) && TextUtils.isEmpty(email.getText().toString())){
+            //clear contact by saving empty strings
+            prefs.edit().putString("name_"+contact_num, name.getText().toString()).putString("phone_"+contact_num, phone.getText().toString()).putString("email_"+contact_num, email.getText().toString()).apply();
+        }
+        else {
 
-                //clear fields
-                name.setText("");
-                phone.setText("");
-                email.setText("");
+            //save contact to preferences
+            prefs.edit().putString("name_"+contact_num, name.getText().toString()).putString("phone_"+contact_num, phone.getText().toString()).putString("email_"+contact_num, email.getText().toString()).apply();
 
-                Toast.makeText(this.getActivity(), "Contact saved!", Toast.LENGTH_SHORT).show();
+            //clear fields
+            name.setText("");
+            phone.setText("");
+            email.setText("");
 
-                //disable edit options
-                name.setEnabled(false);
-                phone.setEnabled(false);
-                email.setEnabled(false);
-                save_btn.setEnabled(false);
+            Toast.makeText(this.getActivity(), "Contact saved!", Toast.LENGTH_SHORT).show();
 
-                //refresh listView
-                populate_listView();
-            }
-        } else {
-            Toast.makeText(this.getActivity(), "Please add a contact before saving", Toast.LENGTH_SHORT).show();
+            //disable edit options
+            name.setEnabled(false);
+            phone.setEnabled(false);
+            email.setEnabled(false);
+            save_btn.setEnabled(false);
+
+            //refresh listView
+            populate_listView();
         }
     }
 
