@@ -14,7 +14,6 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.PowerManager;
 import android.support.v4.content.LocalBroadcastManager;
-import android.util.Log;
 
 /**
  * Created by ClaudiusThaBeast on 4/16/15.
@@ -50,7 +49,7 @@ public class BackgroundService extends Service implements SensorEventListener{
     public BroadcastReceiver mReciever = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            Log.i(TAG, "RECEIVE("+intent+")");
+//            Log.i(TAG, "RECEIVE("+intent+")");
 
             //Only list for screen off
             if(!intent.getAction().equals(Intent.ACTION_SCREEN_OFF))
@@ -99,7 +98,7 @@ public class BackgroundService extends Service implements SensorEventListener{
                 last_z = z;
 
                 if (speed > SHAKE_THRESHOLD) {
-                    Log.d("BACKGROUND", "onSensorChanged");
+//                    Log.d("BACKGROUND", "onSensorChanged");
 
                     Intent intent = new Intent("notify-attack");
                     intent.setClass(this, MainActivity.class);
