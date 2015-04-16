@@ -537,8 +537,6 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
         setContentView(R.layout.activity_main);
 
         // More info: http://codetheory.in/difference-between-setdisplayhomeasupenabled-sethomebuttonenabled-and-setdisplayshowhomeenabled/
-
-
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         context = this;
@@ -1090,8 +1088,7 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
             String geo = "http://maps.google.com/maps?daddr=" + getLat() + "," + getLng();
 
             String title = "I NEED HELP!!";
-            String msg = "Hey this is "+prefs.getString("UserName", "")+"\n I'm currently at " + Uri.parse(geo) + " . I fear for my life." +
-                    "Please send help! \n" +
+            String msg = "Hey this is "+prefs.getString("UserName", "")+"\nI'm currently at " + Uri.parse(geo) + " and I fear for my life. Please send help! \n" +
                     "\n" +
                     "- Sent from StrangerDanger App";
             try {
