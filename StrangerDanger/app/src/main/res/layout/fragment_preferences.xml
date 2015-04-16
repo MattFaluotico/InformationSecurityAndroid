@@ -110,7 +110,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:textAppearance="?android:attr/textAppearanceMedium"
-                        android:text="Gmail:"
+                        android:text="Email:"
                         android:id="@+id/email_cred_label"
                         android:layout_below="@+id/phone_label"
                        />
