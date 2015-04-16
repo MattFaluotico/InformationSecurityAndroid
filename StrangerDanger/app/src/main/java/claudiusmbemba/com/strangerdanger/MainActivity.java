@@ -8,10 +8,13 @@ import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.app.ProgressDialog;
 import android.app.TaskStackBuilder;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.IntentSender;
 import android.content.SharedPreferences;
 import android.hardware.Sensor;
@@ -27,11 +30,14 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
 import android.provider.MediaStore;
 import android.support.v4.app.NotificationCompat;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.telephony.SmsManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -156,7 +162,7 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
 
                 if (speed > SHAKE_THRESHOLD) {
 //                    home.notifyAttack(prefs.getString("phones", ""),home.getLat(),home.getLng());
-                    home.notifyAttack("7406410248", getLat(), getLng());
+                    notifyAttack();
                 }
 
                 last_x = x;
@@ -174,11 +180,17 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
     protected void onPause() {
         super.onPause();
         senSensorManager.unregisterListener(this);
+        LocalBroadcastManager.getInstance(this).registerReceiver(mMessageReceiver, new IntentFilter("notify-attack"));
+
 //        prefs.edit().putBoolean("alert_checked", true).apply();
     }
     protected void onResume() {
         super.onResume();
         senSensorManager.registerListener(this, senAccelerometer, SensorManager.SENSOR_DELAY_NORMAL);
+        //start bacground service
+        startService(new Intent(this, BackgroundService.class));
+        // Register mMessageReceiver to receive messages.
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(mMessageReceiver);
     }
 
     protected class NavItem {
@@ -252,6 +264,9 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
     private Fragment fragment = null;
     private HomeFragment home;
     private String rate;
+    private String email;
+    private String pass;
+
 
     private SharedPreferences prefs;
     private ArrayList<NavItem> mNavItems = new ArrayList<NavItem>();
@@ -524,11 +539,16 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
         setContentView(R.layout.activity_main);
 
         // More info: http://codetheory.in/difference-between-setdisplayhomeasupenabled-sethomebuttonenabled-and-setdisplayshowhomeenabled/
+
+
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         context = this;
 
         prefs = this.getSharedPreferences("claudiusmbemba.com.strangerdanger", MODE_PRIVATE);
+
+        email = prefs.getString("emailAddress", "");
+        pass = prefs.getString("emailPass", "");
 
         //ACCELEROMETER
         senSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
@@ -548,16 +568,16 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
         //create new location client
         locationClient = new LocationClient(this, this, this);
 
-        Location myLoc = (currentLocation == null) ? lastLocation : currentLocation;
-//        if(!manager.isProviderEnabled(LocationManager.GPS_PROVIDER)){
-//            // Get the current location
-//            Toast.makeText(this.getActivity(), "Please turn GPS on", Toast.LENGTH_LONG).show();
-//        }
-//        if (myLoc == null) {
-//            Toast.makeText(this.getActivity(),
-//                    "Trying to get your location.", Toast.LENGTH_LONG).show();
-//        }
-        //set UserName
+//        Location myLoc = (currentLocation == null) ? lastLocation : currentLocation;
+////        if(!manager.isProviderEnabled(LocationManager.GPS_PROVIDER)){
+////            // Get the current location
+////            Toast.makeText(this.getActivity(), "Please turn GPS on", Toast.LENGTH_LONG).show();
+////        }
+////        if (myLoc == null) {
+////            Toast.makeText(this.getActivity(),
+////                    "Trying to get your location.", Toast.LENGTH_LONG).show();
+////        }
+//        //set UserName
         TextView username = (TextView) this.findViewById(R.id.userName);
 
         String uName = prefs.getString("UserName", "");
@@ -851,6 +871,122 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
         alert.show();
     }
 
+    //SMS related code
+    private SmsManager smsManager = SmsManager.getDefault();
+
+    public void notifySMS() {
+        String phone = "7406410248";
+
+//        String phone = prefs.getString("phone_0", "") +","+ prefs.getString("phone_1", "") +","+ prefs.getString("phone_2", "") +","+ prefs.getString("phone_3", "") +","+ prefs.getString("phone_4", "");
+
+        String geo ="http://maps.google.com/maps?daddr="+getLat()+","+getLng();
+        try {
+//            SmsManager smsManager = SmsManager.getDefault();
+            String[] separated = phone.split(",");
+
+            //log phones
+            Log.d("TEST PHONES:", String.valueOf(separated));
+
+            for (String num : separated) {
+                smsManager.sendTextMessage(num, null, "Help! I fear for my life!\n My location is \n "+ Uri.parse(geo)+ " \n Send help!\n -" + prefs.getString("UserName", "")+"\n\n- Sent from StrangerDanger App", null, null);
+            }
+            Toast.makeText(context, "SMS Sent!",
+                    Toast.LENGTH_SHORT).show();
+        } catch (Exception e) {
+            Toast.makeText(context,
+                    "SMS failed, please try again later!",
+                    Toast.LENGTH_LONG).show();
+            e.printStackTrace();
+        }
+    }
+
+    public void notifyAttack() {
+
+        String phone = "7406410248";
+//        String phone = prefs.getString("phone_0", "") +","+ prefs.getString("phone_1", "") +","+ prefs.getString("phone_2", "") +","+ prefs.getString("phone_3", "") +","+ prefs.getString("phone_4", "");
+
+        String geo ="http://maps.google.com/maps?daddr="+getLat()+","+getLng();
+        try {
+//            SmsManager smsManager = SmsManager.getDefault();
+            String[] separated = phone.split(",");
+            for (String num : separated) {
+                smsManager.sendTextMessage(num, null, "HELP!!! I'm being attacked! Call 9-1-1.\n My location is \n "+ Uri.parse(geo)+ "\n -"+prefs.getString("UserName", "")+" \n\n- Sent from StrangerDanger App", null, null);
+            }
+            Toast.makeText(context, "SMS Sent!",
+                    Toast.LENGTH_SHORT).show();
+        } catch (Exception e) {
+            Toast.makeText(context,
+                    "SMS failed, please try again later!",
+                    Toast.LENGTH_LONG).show();
+            e.printStackTrace();
+        }
+    }
+
+    //EMAIL related code
+    public void notifyEmail() {
+
+        if(email.matches("") || pass.matches("")){
+            Toast.makeText(context, "Please enter email info in Preferences", Toast.LENGTH_LONG).show();
+        }else {
+
+            GMailSender sender = new GMailSender(email, pass);
+//            GMailSender sender = new GMailSender("mbembac@gmail.com", "C0nfirmoceanhornadmin!");
+
+            new SendMailTask().execute(sender);
+
+////            "mbembac@gmail.com,Matt.Faluotico@gmail.com,esh.derek@gmail.com,fenton.joshua4@gmail.com,trong.p.le.92@gmail.com,jlasuperman.new52@gmail.com"
+
+        }
+    }
+    public void SendICENotification() {
+        //        Handler myHandler = new Handler();
+//        myHandler.postDelayed(playSound, 3000);
+        //delaySiren
+        final Handler handler = new Handler();
+        //Do something after 100ms
+
+        Boolean smsPref = prefs.getBoolean("sms", false);
+        Boolean emailPref = prefs.getBoolean("email", false);
+
+        String phones = prefs.getString("phone_0", "");
+        String recipients = prefs.getString("email_0", "");
+
+        if(smsPref){
+            if(!phones.matches("")) {
+//                notifySMS(phones, getLat(), getLng());
+                notifySMS();
+            }
+        }
+        if(emailPref){
+            if(!recipients.matches("")) {
+                if(isConnected()) {
+//            notifyEmail(recipients, getLat(), getLng());
+                    notifyEmail();
+                }else{
+                    Toast.makeText(context, "Cannot notify via email.\nNo network or wifi available.", Toast.LENGTH_LONG).show();
+                }
+            }
+        }
+    }
+
+    // handler for received Intents for the "notify-attack" event
+    private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            // Extract data included in the Intent
+            String message = intent.getStringExtra("notify");
+//            Log.d("receiver", "Got message: " + message);
+            if(message.matches("attack")){
+                notifyAttack();
+            }
+//        if(notify != null ){
+//            if(notify.getStringExtra("notify").matches("attack")) {
+//                notifyAttack();
+//            }
+//        }
+        }
+    };
+
     //HTTP GET CALL
     private static String convertInputStreamToString(InputStream inputStream) throws IOException {
         BufferedReader bufferedReader = new BufferedReader( new InputStreamReader(inputStream));
@@ -942,6 +1078,49 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
                 LocationAlertNotification(msg);
 //                Toast.makeText(context, "Our records indicate:\n High Crime Rate Area", Toast.LENGTH_LONG).show();
             }
+        }
+    }
+
+    //SENDMAIL ASYNC
+    private class SendMailTask extends AsyncTask<GMailSender, Void, Void> {
+        private ProgressDialog progressDialog;
+
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            progressDialog = ProgressDialog.show(context, "Sending Emails", "Please wait...", true, false);
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+            progressDialog.dismiss();
+            Toast.makeText(context, "Emails sent!", Toast.LENGTH_SHORT).show();
+        }
+
+        @Override
+        protected Void doInBackground(GMailSender... params) {
+
+            String recipients = prefs.getString("emails", "");
+            String geo = "http://maps.google.com/maps?daddr=" + getLat() + "," + getLng();
+
+            String title = "Help Me!";
+            String msg = "Hey this is Claudius\n I'm currently at " + Uri.parse(geo) + " . I fear for my life." +
+                    "Please send help! \n" +
+                    "\n" +
+                    "- Sent from StrangerDanger App";
+            try {
+
+                // add attachements
+                // params[0].addAttachment(Environment.getExternalStorageDirectory().getPath()+"/image.jpg");
+                params[0].sendMail(title, msg, "mbembac@gmail.com", "mbemba.1@osu.edu");
+//                params[0].sendMail(title, msg, email, recipients);
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            return null;
         }
     }
 
