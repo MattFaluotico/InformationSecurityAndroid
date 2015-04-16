@@ -9,7 +9,7 @@
     <!-- how often the dispatcher should fire -->
     <integer name="ga_dispatchPeriod">30</integer>
 
-    <!-- Treat events as test events and don't send to google -->
+    <!-- true: Treat events as test events and don't send to google? -->
     <bool name="ga_dryRun">false</bool>
 
     <!-- The screen names that will appear in reports -->

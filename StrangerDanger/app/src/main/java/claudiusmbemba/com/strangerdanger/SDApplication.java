@@ -16,7 +16,7 @@ public class SDApplication extends Application {
     private static final String PROPERTY_ID = "UA-61904459-1";
 
     //Logging TAG
-    private static final String TAG = "MyApp";
+    private static final String TAG = "SDAPP";
 
     public static int GENERAL_TRACKER = 0;
 

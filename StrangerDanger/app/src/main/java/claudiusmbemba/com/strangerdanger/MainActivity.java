@@ -661,11 +661,9 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
         if(prefs.getBoolean("alerts", false)) {
             prefs.edit().putBoolean("alert_checked", true).apply();
         }
-
         //G-ANALYTICS
         //Get a Tracker (should auto-report)
         ((SDApplication) getApplication()).getTracker(SDApplication.TrackerName.APP_TRACKER);
-
     }
 
     /*
