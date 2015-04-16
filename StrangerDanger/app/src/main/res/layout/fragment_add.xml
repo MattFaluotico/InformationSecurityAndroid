@@ -5,6 +5,7 @@
     android:layout_width="match_parent"
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:fillViewport="true">
+
     <LinearLayout
         android:orientation="vertical"
         android:layout_width="match_parent"
@@ -14,35 +15,22 @@
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="0.2"
-            android:id="@+id/save_contact_view">
+            android:layout_weight="0.01"
+            android:id="@+id/save_contact_view"
+            android:layout_margin="10dp">
 
-            <LinearLayout
+            <!--contact list-->
+            <ListView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical">
-
-                <!--contact list-->
-                <RelativeLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="0dp"
-                    android:layout_weight="0.6"
-                    android:layout_margin="10dp">
-
-                    <ListView
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:id="@+id/list" />
-                </RelativeLayout>
-
-            </LinearLayout>
-
+                android:id="@+id/list" />
         </RelativeLayout>
 
         <!--add contacts-->
         <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp">
 
             <LinearLayout
                 xmlns:android="http://schemas.android.com/apk/res/android"
@@ -50,13 +38,13 @@
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:layout_alignParentTop="true">
+
                 <!--labels-->
                 <RelativeLayout
                     android:layout_width="102dp"
                     android:layout_height="wrap_content"
                     android:layout_gravity="right"
-                    android:paddingLeft="20dp"
-                    android:paddingTop="10dp">
+                    android:paddingLeft="20dp">
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -120,7 +108,8 @@
         <!--save button-->
         <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="20dp">
 
             <Button
                 android:layout_width="wrap_content"
