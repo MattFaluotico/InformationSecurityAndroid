@@ -2,16 +2,21 @@ package claudiusmbemba.com.strangerdanger;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentSender;
 import android.content.SharedPreferences;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.location.GpsStatus;
+import android.location.Location;
+import android.location.LocationManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
@@ -36,6 +41,12 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GooglePlayServicesClient;
+import com.google.android.gms.common.GooglePlayServicesUtil;
+import com.google.android.gms.location.LocationClient;
+import com.google.android.gms.location.LocationRequest;
+
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
@@ -53,15 +64,74 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Locale;
 
-public class MainActivity extends ActionBarActivity implements SensorEventListener {
+public class MainActivity extends ActionBarActivity implements SensorEventListener,GooglePlayServicesClient.OnConnectionFailedListener,
+        GooglePlayServicesClient.ConnectionCallbacks,
+        com.google.android.gms.location.LocationListener, GpsStatus.Listener {
 
-    //ACCELEROMETER RELATED CODE
+    //LOCATION RELATED DEF CODE
+    private final static int CONNECTION_FAILURE_RESOLUTION_REQUEST = 9000;
+
+    /*
+     * Constants for location update parameters
+     */
+    // Milliseconds per second
+    private static final int MILLISECONDS_PER_SECOND = 1000;
+
+    // The update interval
+    private static final int UPDATE_INTERVAL_IN_SECONDS = 5;
+
+    // A fast interval ceiling
+    private static final int FAST_CEILING_IN_SECONDS = 1;
+
+    // Update interval in milliseconds
+    private static final long UPDATE_INTERVAL_IN_MILLISECONDS = MILLISECONDS_PER_SECOND
+            * UPDATE_INTERVAL_IN_SECONDS;
+
+    // A fast ceiling of update intervals, used when the app is visible
+    private static final long FAST_INTERVAL_CEILING_IN_MILLISECONDS = MILLISECONDS_PER_SECOND
+            * FAST_CEILING_IN_SECONDS;
+
+    /*
+     * Constants for handling location results
+     */
+    // Conversion from feet to meters
+    private static final float METERS_PER_FEET = 0.3048f;
+
+    // Conversion from kilometers to meters
+    private static final int METERS_PER_KILOMETER = 1000;
+
+    // Initial offset for calculating the map bounds
+    private static final double OFFSET_CALCULATION_INIT_DIFF = 1.0;
+
+    // Accuracy for calculating the map bounds
+    private static final float OFFSET_CALCULATION_ACCURACY = 0.01f;
+
+    // Maximum results returned from a Parse query
+    private static final int MAX_POST_SEARCH_RESULTS = 20;
+
+    // Maximum post search radius for map in kilometers
+    private static final int MAX_POST_SEARCH_DISTANCE = 100;
+
+    private Location lastLocation;
+    private Location currentLocation;
+
+    // A request to connect to Location Services
+    private LocationRequest locationRequest;
+
+    // Stores the current instantiation of the location client in this object
+    private LocationClient locationClient;
+
+    private LocationManager manager = null;
+
+
+    //ACCELEROMETER RELATED DEF CODE
     private SensorManager senSensorManager;
     private Sensor senAccelerometer;
     private long lastUpdate = 0;
     private float last_x, last_y, last_z;
     private static final int SHAKE_THRESHOLD = 2000;
 
+    //ACCELEROMETER RELATED METHODS
     @Override
     public void onSensorChanged(SensorEvent event) {
         Sensor mySensor = event.sensor;
@@ -81,7 +151,7 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
 
                 if (speed > SHAKE_THRESHOLD) {
 //                    home.notifyAttack(prefs.getString("phones", ""),home.getLat(),home.getLng());
-                    home.notifyAttack("7406410248",home.getLat(),home.getLng());
+                    home.notifyAttack("7406410248", getLat(), getLng());
                 }
 
                 last_x = x;
@@ -233,6 +303,216 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
 //    }
 
     @Override
+    public void onStart() {
+        super.onStart();
+        locationClient.connect();
+    }
+
+    @Override
+    public void onStop() {
+        if (locationClient.isConnected()) {
+            stopPeriodicUpdates();
+        }
+
+        locationClient.disconnect();
+        super.onStop();
+    }
+
+    @Override
+    public void onConnected(Bundle bundle) {
+//        Toast.makeText(this.getActivity(), "Connected", Toast.LENGTH_SHORT).show();
+//        if(manager.isProviderEnabled(LocationManager.GPS_PROVIDER)){
+//            // Get the current location
+//            Toast.makeText(this.getActivity(), "Getting Location", Toast.LENGTH_LONG).show();
+//        }
+        currentLocation = getLocation();
+        lastLocation = getLocation();
+        startPeriodicUpdates();
+    }
+
+    @Override
+    public void onGpsStatusChanged(int event) {
+        //empty code
+    }
+
+    /*
+    * Get the current location
+    */
+    private Location getLocation() {
+        // If Google Play Services is available
+        if (servicesConnected()) {
+            // Get the current location
+            return locationClient.getLastLocation();
+        } else {
+            return null;
+        }
+    }
+    @Override
+    public void onDisconnected() {
+        Toast.makeText(this, "Disconnected. Please re-connect.", Toast.LENGTH_SHORT).show();
+    }
+
+    private void startPeriodicUpdates() {
+        locationClient.requestLocationUpdates(locationRequest, (com.google.android.gms.location.LocationListener) this);
+    }
+
+    private void stopPeriodicUpdates() {
+        locationClient.removeLocationUpdates((com.google.android.gms.location.LocationListener) this);
+    }
+
+    private boolean servicesConnected() {
+        // Check that Google Play services is available
+        int resultCode =
+                GooglePlayServicesUtil.
+                        isGooglePlayServicesAvailable(this);
+        // If Google Play services is available
+        if (ConnectionResult.SUCCESS == resultCode) {
+            // In debug mode, log the status
+            Log.d("Location Updates",
+                    "Google Play services is available.");
+            // Continue
+            return true;
+            // Google Play services was not available for some reason.
+            // resultCode holds the error code.
+        } else {
+            // Get the error dialog from Google Play services
+            Dialog errorDialog = GooglePlayServicesUtil.getErrorDialog(
+                    resultCode,
+                    this,
+                    CONNECTION_FAILURE_RESOLUTION_REQUEST);
+
+            // If Google Play services can provide an error dialog
+            if (errorDialog != null) {
+                Toast.makeText(this, "Google PLay Services Not available", Toast.LENGTH_LONG).show();
+                // Create a new DialogFragment for the error dialog
+                ErrorDialogFragment errorFragment =
+                        new ErrorDialogFragment();
+                // Set the dialog in the DialogFragment
+                errorFragment.setDialog(errorDialog);
+                // Show the error dialog in the DialogFragment
+//                errorFragment.show(this.getActivity().getFragmentManager(), "Location Updates");
+            }
+            return false;
+        }
+    }
+
+    @Override
+    //OnLocationChanged is never called until the gps is fixed.
+    public void onLocationChanged(Location location) {
+
+        currentLocation = location;
+
+//        String msg = "Update location: " + Double.toString(location.getLatitude()) + ", " + Double.toString(location.getLongitude());
+//        Toast.makeText(this.getActivity(), msg, Toast.LENGTH_LONG).show();
+        if(lastLocation != null){
+            double lat1 = lastLocation.getLatitude();
+            double lng1 = lastLocation.getLongitude();
+
+            double lat2 = location.getLatitude();
+            double lng2 = location.getLongitude();
+
+            // lat1 and lng1 are the values of a previously stored location
+            if (distance(lat1, lng1, lat2, lng2) > 0.10) { // if distance > 2 miles
+                //notify
+                checkForLocationAlert();
+                //update lastknow location to current
+                lastLocation = location;
+            }
+        }
+
+        if(prefs.getBoolean("alert_checked", false)){
+            checkForLocationAlert();
+        }
+    }
+
+    /** calculates the distance between two locations in MILES */
+    private double distance(double lat1, double lng1, double lat2, double lng2) {
+
+        double earthRadius = 3958.75; // in miles, change to 6371 for kilometer output
+
+        double dLat = Math.toRadians(lat2-lat1);
+        double dLng = Math.toRadians(lng2-lng1);
+
+        double sindLat = Math.sin(dLat / 2);
+        double sindLng = Math.sin(dLng / 2);
+
+        double a = Math.pow(sindLat, 2) + Math.pow(sindLng, 2)
+                * Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2));
+
+        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+
+        double dist = earthRadius * c;
+
+        return dist; // output distance, in MILES
+    }
+
+    public String getLat(){
+        if (!manager.isProviderEnabled(LocationManager.GPS_PROVIDER)){
+            return null;
+        }else{
+            Double loc = currentLocation.getLatitude();
+            return loc.toString();
+        }
+    }
+
+    public String getLng(){
+        if (!manager.isProviderEnabled(LocationManager.GPS_PROVIDER)){
+            return null;
+        }else {
+            Double loc = currentLocation.getLongitude();
+            return loc.toString();
+        }
+    }
+
+    public Boolean checkGPSEnabled(){
+//        if(manager.isProviderEnabled(LocationManager.GPS_PROVIDER) || manager != null){
+        if(manager.isProviderEnabled(LocationManager.GPS_PROVIDER) && manager != null){
+            return true;
+        }else{
+            return false;
+        }
+    }
+
+    @Override
+    public void onConnectionFailed(ConnectionResult connectionResult) {
+
+        if (connectionResult.hasResolution()) {
+            try {
+                connectionResult.startResolutionForResult(this, CONNECTION_FAILURE_RESOLUTION_REQUEST);
+            } catch (IntentSender.SendIntentException e) {
+//                Log.d(ParseApplication.APPTAG, "An error occurred when connecting to location services.", e);
+                e.printStackTrace();
+            }
+        } else {
+            Toast.makeText(this, "Error: Connection failed: "+connectionResult.getErrorCode(), Toast.LENGTH_SHORT).show();
+//            showErrorDialog(connectionResult.getErrorCode());
+        }
+
+    }
+
+    public void gpsEnabledNotification(){
+
+        final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
+        builder.setMessage("For accurate reporting please enable GPS")
+                .setCancelable(false)
+                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        startActivity(new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS));
+                    }
+                })
+                .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+        final AlertDialog alert = builder.create();
+        alert.show();
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
@@ -244,10 +524,33 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
 
         prefs = this.getSharedPreferences("claudiusmbemba.com.strangerdanger", MODE_PRIVATE);
 
+        //ACCELEROMETER
         senSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         senAccelerometer = senSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
         senSensorManager.registerListener(this, senAccelerometer , SensorManager.SENSOR_DELAY_NORMAL);
 
+        //LOCATION
+        manager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE );
+        //create global location object
+        locationRequest = LocationRequest.create();
+        //set update interval
+        locationRequest.setInterval(UPDATE_INTERVAL_IN_MILLISECONDS);
+        //use high accuracy
+        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        //set interval ceiling to 1 min
+        locationRequest.setFastestInterval(FAST_INTERVAL_CEILING_IN_MILLISECONDS);
+        //create new location client
+        locationClient = new LocationClient(this, this, this);
+
+        Location myLoc = (currentLocation == null) ? lastLocation : currentLocation;
+//        if(!manager.isProviderEnabled(LocationManager.GPS_PROVIDER)){
+//            // Get the current location
+//            Toast.makeText(this.getActivity(), "Please turn GPS on", Toast.LENGTH_LONG).show();
+//        }
+//        if (myLoc == null) {
+//            Toast.makeText(this.getActivity(),
+//                    "Trying to get your location.", Toast.LENGTH_LONG).show();
+//        }
         //set UserName
         TextView username = (TextView) this.findViewById(R.id.userName);
 
@@ -288,10 +591,6 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
             @Override
             public void onDrawerOpened(View drawerView) {
                 super.onDrawerOpened(drawerView);
-
-                if(prefs.getBoolean("alert_checked", false)){
-                    checkForLocationAlert();
-                }
 
                 invalidateOptionsMenu();
             }
@@ -391,9 +690,9 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
 
         String lat = null, lng = null;
 
-        if(home.checkGPSenabled()){
-            lat = home.getLat();
-            lng = home.getLng();
+        if(checkGPSEnabled()){
+            lat = getLat();
+            lng = getLng();
 //            Log.d("LAT", lat.toString());
 //            Log.d("LONG", lng.toString());
             //push intent
@@ -408,7 +707,7 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
             startActivity(mapIntent);
         }else{
 //            Toast.makeText(this, "Could not get location. Please check GPS is on", Toast.LENGTH_LONG).show();
-            home.gpsEnabledNotification();
+            gpsEnabledNotification();
         }
     }
 
@@ -474,12 +773,12 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
 
     public void checkForLocationAlert() {
         if(prefs.getBoolean("alerts", false)) {
-            if (home.checkGPSenabled()) {
+            if (servicesConnected()) {
                 if(isConnected()){
                     //        if(true){
                     // call AsynTask to perform network operation on separate thread
 //        new HttpAsyncTask().execute("https://maps.googleapis.com/maps/api/place/search/json?location=37.785835,-122.406418&rankby=distance&types=police&sensor=false&key=AIzaSyCU7rZMOqBsI87fpoZBSIxQPs0A9yLK6k0");
-                    new HttpAsyncTask().execute("http://api.spotcrime.com/crimes.json?lat=" + home.getLat() + "&lon=" + home.getLng() + "&radius=0.050&callback=&key=MLC-restricted-key");
+                    new HttpAsyncTask().execute("http://api.spotcrime.com/crimes.json?lat=" + getLat() + "&lon=" + getLng() + "&radius=0.050&callback=&key=MLC-restricted-key");
                 }else{
                     Toast.makeText(this, "No network or wifi available.\nPlease enable.", Toast.LENGTH_LONG).show();
                 }
@@ -609,5 +908,28 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
         }
     }
 
+    // Define a DialogFragment that displays the error dialog
+    public static class ErrorDialogFragment extends android.support.v4.app.DialogFragment {
+        // Global field to contain the error dialog
+        private Dialog mDialog;
+
+        // Default constructor. Sets the dialog field to null
+        public ErrorDialogFragment() {
+            super();
+            mDialog = null;
+        }
+
+        // Set the dialog to display
+        public void setDialog(Dialog dialog) {
+            mDialog = dialog;
+        }
+
+        // Return a Dialog to the DialogFragment.
+        @Override
+        public Dialog onCreateDialog(Bundle savedInstanceState) {
+            return mDialog;
+        }
+
+    }
 
 }
