@@ -18,6 +18,11 @@
             </intent-filter>
         </activity>
 
+        <!--backgroundService-->
+        <service android:enabled="true"
+            android:name=".BackgroundService">
+        </service>
+
         <!--g-maps-->
         <meta-data
             android:name="com.google.android.gms.version"
