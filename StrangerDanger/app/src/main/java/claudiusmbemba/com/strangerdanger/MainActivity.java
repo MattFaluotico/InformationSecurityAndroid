@@ -37,7 +37,6 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.telephony.SmsManager;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -278,7 +277,7 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
                 Environment.DIRECTORY_PICTURES), getPackageName());
         if (!directory.exists()) {
             if (!directory.mkdirs()) {
-                Log.e(TAG, "Failed to create storage directory.");
+//                Log.e(TAG, "Failed to create storage directory.");
                 return null;
             }
         }
@@ -387,8 +386,8 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
         // If Google Play services is available
         if (ConnectionResult.SUCCESS == resultCode) {
             // In debug mode, log the status
-            Log.d("Location Updates",
-                    "Google Play services is available.");
+//            Log.d("Location Updates",
+//                    "Google Play services is available.");
             // Continue
             return true;
             // Google Play services was not available for some reason.
@@ -622,7 +621,7 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
             @Override
             public void onDrawerClosed(View drawerView) {
                 super.onDrawerClosed(drawerView);
-                Log.d(TAG, "onDrawerClosed: " + getTitle());
+//                Log.d(TAG, "onDrawerClosed: " + getTitle());
 
                 invalidateOptionsMenu();
             }
@@ -1005,7 +1004,7 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
                 result = "Did not work!";
 
         } catch (Exception e) {
-            Log.d("InputStream", e.getLocalizedMessage());
+//            Log.d("InputStream", e.getLocalizedMessage());
         }
 
         return result;
@@ -1028,7 +1027,7 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
 //            }
 
 //            Toast.makeText(context, "Received!", Toast.LENGTH_LONG).show();
-            Log.d("RESULT", result);
+//            Log.d("RESULT", result);
 
             int crimes_count = 0;
             try {
