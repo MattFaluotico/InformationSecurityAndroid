@@ -446,7 +446,7 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
             // lat1 and lng1 are the values of a previously stored location
             // if distance > 2 miles
             // if (distance(lat1, lng1, lat2, lng2) > 0.10) {
-            if (distance(lat1, lng1, lat2, lng2) > 2) {
+            if (distance(lat1, lng1, lat2, lng2) > 0.10) {
                 //notify
                 checkForLocationAlert();
                 //update lastknow location to current

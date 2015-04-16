@@ -33,14 +33,14 @@
             android:name="com.google.android.maps.v2.API_KEY"
             android:value="AIzaSyDdDpGkDwdVATDZni-NrtfB9Ua6nJC3i0M" />
 
-        <uses-feature
-            android:glEsVersion="0x00020000"
-            android:required="true" />
-
         <meta-data android:name="com.google.android.gms.analytics.globalConfigResource"
             android:resource="@xml/global_tracker" />
 
     </application>
+
+    <uses-feature
+        android:glEsVersion="0x00020000"
+        android:required="true" />
 
     <!--gps-->
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
