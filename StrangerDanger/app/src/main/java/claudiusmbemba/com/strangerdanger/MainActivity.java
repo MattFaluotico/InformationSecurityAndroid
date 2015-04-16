@@ -3,8 +3,12 @@ package claudiusmbemba.com.strangerdanger;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.app.DialogFragment;
 import android.app.Fragment;
 import android.app.FragmentManager;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.app.TaskStackBuilder;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -24,6 +28,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.support.v4.app.NotificationCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -246,6 +251,7 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
     private DrawerLayout mDrawerLayout;
     private Fragment fragment = null;
     private HomeFragment home;
+    private String rate;
 
     private SharedPreferences prefs;
     private ArrayList<NavItem> mNavItems = new ArrayList<NavItem>();
@@ -779,6 +785,9 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
                     // call AsynTask to perform network operation on separate thread
 //        new HttpAsyncTask().execute("https://maps.googleapis.com/maps/api/place/search/json?location=37.785835,-122.406418&rankby=distance&types=police&sensor=false&key=AIzaSyCU7rZMOqBsI87fpoZBSIxQPs0A9yLK6k0");
                     new HttpAsyncTask().execute("http://api.spotcrime.com/crimes.json?lat=" + getLat() + "&lon=" + getLng() + "&radius=0.050&callback=&key=MLC-restricted-key");
+
+                    StatusBarNotify();
+
                 }else{
                     Toast.makeText(this, "No network or wifi available.\nPlease enable.", Toast.LENGTH_LONG).show();
                 }
@@ -789,6 +798,39 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
                 Toast.makeText(this, "Enable GPS for Location Alerts", Toast.LENGTH_LONG).show();
             }
         }
+    }
+
+    private void StatusBarNotify() {
+        int notifyID = 1;
+
+        //create Status Bar notification
+        NotificationCompat.Builder mBuilder =
+                new NotificationCompat.Builder(getApplicationContext())
+                        .setSmallIcon(R.drawable.ic_launcher)
+                        .setContentTitle("Location Alert")
+                        .setContentText(rate);
+
+// Creates an explicit intent for an Activity in your app
+        Intent resultIntent = new Intent(context, context.getClass());
+// The stack builder object will contain an artificial back stack for the
+// started Activity.
+// This ensures that navigating backward from the Activity leads out of
+// your application to the Home screen.
+        TaskStackBuilder stackBuilder = TaskStackBuilder.create(context);
+// Adds the back stack for the Intent (but not the Intent itself)
+        stackBuilder.addParentStack(context.getClass());
+// Adds the Intent that starts the Activity to the top of the stack
+        stackBuilder.addNextIntent(resultIntent);
+        PendingIntent resultPendingIntent =
+                stackBuilder.getPendingIntent(
+                        0,
+                        PendingIntent.FLAG_UPDATE_CURRENT
+                );
+        mBuilder.setContentIntent(resultPendingIntent);
+        NotificationManager mNotificationManager =
+                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+// mId allows you to update the notification later on.
+        mNotificationManager.notify(notifyID, mBuilder.build());
     }
 
     public void LocationAlertNotification(String msg){
@@ -878,38 +920,33 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
                 e.printStackTrace();
             }
 
+            String intro = "Our records indicate:\n";
+            String msg;
+
             //0-10: Low crime
             //11-30: Med crime
             //31+: high crime
             if(crimes_count <= 10){
-                LocationAlertNotification("Our records indicate:\nA LOW CRIME RATE Area.\nBut stay alert out there!");
+                rate = "A LOW CRIME RATE Area.\nBut stay alert out there!";
+                msg = intro + rate;
+                LocationAlertNotification(msg);
 //                Toast.makeText(context, "Our records indicate:\n Low Crime Rate Area", Toast.LENGTH_LONG).show();
             }else if(crimes_count <=30){
-                LocationAlertNotification("Our records indicate:\nA MED CRIME RATE Area.\nEyes Peeled Please!");
+                rate = "A MED CRIME RATE Area.\nEyes Peeled Please!";
+                msg = intro + rate;
+                LocationAlertNotification(msg);
 //                Toast.makeText(context, "Our records indicate:\n Med Crime Rate Area", Toast.LENGTH_LONG).show();
             }else{
-                LocationAlertNotification("Our records indicate:\nA HIGH CRIME RATE Area.\nExercise Extreme Caution at night!");
+                rate = "A HIGH CRIME RATE Area.\nExercise Extreme Caution at night!";
+                msg = intro + rate;
+                LocationAlertNotification(msg);
 //                Toast.makeText(context, "Our records indicate:\n High Crime Rate Area", Toast.LENGTH_LONG).show();
             }
-//            // Create a Uri from an intent string. Use the result to create an Intent.
-////            Uri gmmIntentUri = Uri.parse("google.streetview:cbll="+slat+","+slng);
-////            Uri gmmIntentUri = Uri.parse("geo:"+slat+","+slng);
-//
-//            Uri gmmIntentUri = Uri.parse("geo:37.783762,-122.412915?q=police");
-//
-//            // Create an Intent from gmmIntentUri. Set the action to ACTION_VIEW
-//            Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
-//            // Make the Intent explicit by setting the Google Maps package
-//            mapIntent.setPackage("com.google.android.apps.maps");
-//
-//            // Attempt to start an activity that can handle the Intent
-//            startActivity(mapIntent);
-
         }
     }
 
     // Define a DialogFragment that displays the error dialog
-    public static class ErrorDialogFragment extends android.support.v4.app.DialogFragment {
+    public static class ErrorDialogFragment extends DialogFragment {
         // Global field to contain the error dialog
         private Dialog mDialog;
 
