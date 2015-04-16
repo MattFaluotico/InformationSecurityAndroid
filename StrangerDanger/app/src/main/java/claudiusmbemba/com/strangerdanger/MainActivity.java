@@ -50,11 +50,12 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GooglePlayServicesClient;
 import com.google.android.gms.common.GooglePlayServicesUtil;
-import com.google.android.gms.location.LocationClient;
+import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationServices;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -73,8 +74,11 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Locale;
 
-public class MainActivity extends ActionBarActivity implements SensorEventListener,GooglePlayServicesClient.OnConnectionFailedListener,
-        GooglePlayServicesClient.ConnectionCallbacks,
+//import com.google.android.gms.location.LocationClient;
+
+public class MainActivity extends ActionBarActivity implements SensorEventListener,
+        GoogleApiClient.OnConnectionFailedListener,
+        GoogleApiClient.ConnectionCallbacks,
         com.google.android.gms.location.LocationListener, GpsStatus.Listener {
 
     //LOCATION RELATED DEF CODE
@@ -128,7 +132,7 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
     private LocationRequest locationRequest;
 
     // Stores the current instantiation of the location client in this object
-    private LocationClient locationClient;
+    private GoogleApiClient locationClient;
 
     private LocationManager manager = null;
 
@@ -324,14 +328,17 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
     public void onStart() {
         super.onStart();
         locationClient.connect();
+        //Get an Analytics tracker to report app starts and uncaught exceptions etc.
+        GoogleAnalytics.getInstance(this).reportActivityStart(this);
     }
 
     @Override
     public void onStop() {
+        //Stop the analytics tracking
+        GoogleAnalytics.getInstance(this).reportActivityStop(this);
         if (locationClient.isConnected()) {
             stopPeriodicUpdates();
         }
-
         locationClient.disconnect();
         super.onStop();
     }
@@ -349,6 +356,11 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
     }
 
     @Override
+    public void onConnectionSuspended(int i) {
+
+    }
+
+    @Override
     public void onGpsStatusChanged(int event) {
         //empty code
     }
@@ -360,22 +372,24 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
         // If Google Play Services is available
         if (servicesConnected()) {
             // Get the current location
-            return locationClient.getLastLocation();
+            return LocationServices.FusedLocationApi.getLastLocation(locationClient);
         } else {
             return null;
         }
     }
-    @Override
+
     public void onDisconnected() {
         Toast.makeText(this, "Disconnected. Please re-connect.", Toast.LENGTH_SHORT).show();
     }
 
     private void startPeriodicUpdates() {
-        locationClient.requestLocationUpdates(locationRequest, (com.google.android.gms.location.LocationListener) this);
+        LocationServices.FusedLocationApi.requestLocationUpdates(locationClient, locationRequest, this);
+//        locationClient.requestLocationUpdates(locationRequest, (com.google.android.gms.location.LocationListener) this);
     }
 
     private void stopPeriodicUpdates() {
-        locationClient.removeLocationUpdates((com.google.android.gms.location.LocationListener) this);
+        LocationServices.FusedLocationApi.removeLocationUpdates(locationClient,this);
+//        locationClient.removeLocationUpdates((com.google.android.gms.location.LocationListener) this);
     }
 
     private boolean servicesConnected() {
@@ -563,7 +577,11 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
         //set interval ceiling to 1 min
         locationRequest.setFastestInterval(FAST_INTERVAL_CEILING_IN_MILLISECONDS);
         //create new location client
-        locationClient = new LocationClient(this, this, this);
+        locationClient = new GoogleApiClient.Builder(this)
+                .addApi(LocationServices.API)
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+                .build();
 
 //        Location myLoc = (currentLocation == null) ? lastLocation : currentLocation;
 ////        if(!manager.isProviderEnabled(LocationManager.GPS_PROVIDER)){
@@ -589,7 +607,7 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
         mNavItems.add(new NavItem("Police", "Contact nearest police", R.drawable.police));
         mNavItems.add(new NavItem("Camera", "Take photo evidence", R.drawable.camera));
         mNavItems.add(new NavItem("Preferences", "Change your preferences", R.drawable.settings));
-        mNavItems.add(new NavItem("About", "About this app", R.drawable.menu));
+//        mNavItems.add(new NavItem("About", "About this app", R.drawable.menu));
         mNavItems.add(new NavItem("Logout", "Sign out", R.drawable.logout));
 
         // DrawerLayout
@@ -643,6 +661,11 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
         if(prefs.getBoolean("alerts", false)) {
             prefs.edit().putBoolean("alert_checked", true).apply();
         }
+
+        //G-ANALYTICS
+        //Get a Tracker (should auto-report)
+        ((SDApplication) getApplication()).getTracker(SDApplication.TrackerName.APP_TRACKER);
+
     }
 
     /*
@@ -660,10 +683,10 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
                 fragment = new HomeFragment();
                 setTitle(mNavItems.get(position).mTitle);
                 break;
-            case "About":
-                fragment = new AboutFragment();
-                setTitle(mNavItems.get(position).mTitle);
-                break;
+//            case "About":
+//                fragment = new AboutFragment();
+//                setTitle(mNavItems.get(position).mTitle);
+//                break;
             case "Preferences":
                 fragment = new PreferencesFragment();
                 setTitle(mNavItems.get(position).mTitle);
@@ -1128,5 +1151,4 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
         }
 
     }
-
 }
