@@ -21,6 +21,7 @@ StrangerDanger is first and foremost a safety app. Say you’re walking home alo
 * GPS integration
 * using Android SharedPreferences for localize data store
 * No sending data over the network (only getting) - very secure
+
 #Native Android APIs used:
 * Service
 * SensorEventListener
