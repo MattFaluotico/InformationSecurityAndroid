@@ -75,8 +75,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Locale;
 
-//import com.google.android.gms.location.LocationClient;
-
 public class MainActivity extends ActionBarActivity implements SensorEventListener,
         GoogleApiClient.OnConnectionFailedListener,
         GoogleApiClient.ConnectionCallbacks,
@@ -269,7 +267,7 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
     private String email;
     private String pass;
     private MediaPlayer siren;
-
+    private TextView username;
 
     private SharedPreferences prefs;
     private ArrayList<NavItem> mNavItems = new ArrayList<NavItem>();
@@ -548,6 +546,11 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
         alert.show();
     }
 
+
+    public TextView uName(){
+        return username;
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -597,7 +600,7 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
 ////                    "Trying to get your location.", Toast.LENGTH_LONG).show();
 ////        }
 //        //set UserName
-        TextView username = (TextView) this.findViewById(R.id.userName);
+        username = (TextView) this.findViewById(R.id.userName);
 
         String uName = prefs.getString("UserName", "");
         if(uName.matches("")){

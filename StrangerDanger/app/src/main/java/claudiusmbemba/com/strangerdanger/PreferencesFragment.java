@@ -89,6 +89,8 @@ public class PreferencesFragment extends Fragment implements View.OnClickListene
 
         prefs.edit().putBoolean("sms", smsPref).putBoolean("email", emailPref).putBoolean("alerts", alertPref).putString("emailAddress", emailAdd).putString("emailPass", pass).putString("UserName", userName.getText().toString()).apply();
 
+        ((MainActivity)getActivity()).uName().setText(userName.getText().toString());
+
         Toast.makeText(this.getActivity(), "Changes saved!", Toast.LENGTH_LONG).show();
     }
 }
