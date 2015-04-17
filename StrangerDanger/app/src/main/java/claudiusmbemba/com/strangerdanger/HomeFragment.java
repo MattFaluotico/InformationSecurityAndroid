@@ -3,7 +3,6 @@ package claudiusmbemba.com.strangerdanger;
 import android.app.Fragment;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -27,7 +26,7 @@ public class HomeFragment extends Fragment implements
 
     private Button notify;
     private Context context;
-    private MediaPlayer siren;
+//    private MediaPlayer siren;
     //    private MediaPlayer leedle;
     private SharedPreferences prefs;
     private ImageButton siren_btn;
@@ -39,7 +38,7 @@ public class HomeFragment extends Fragment implements
 
         context = this.getActivity();
 
-        siren = MediaPlayer.create(context, R.raw.siren);
+//        siren = MediaPlayer.create(context, R.raw.siren);
 //        leedle = MediaPlayer.create(context, R.raw.leedle);
 
         View view = inflater.inflate(R.layout.fragment_home, container, false);
@@ -98,12 +97,12 @@ public class HomeFragment extends Fragment implements
 //        Toast.makeText(this.getActivity(), "ICEs will be notified!", Toast.LENGTH_LONG).show();
 
         if(v.getId() == R.id.siren_button){
-            if(siren.isPlaying()) {
+            if(((MainActivity)getActivity()).getSiren().isPlaying()) {
                 // Pause the music player
-                siren.pause();
+                ((MainActivity)getActivity()).sirenStop();
                 // If it's not playing
             }else {
-                siren.start();
+                ((MainActivity)getActivity()).sirenStart();
                 ((MainActivity)getActivity()).SendICENotification();
                 //delayed start
 //            handler.postDelayed(new Runnable() {
@@ -115,9 +114,9 @@ public class HomeFragment extends Fragment implements
 //            }, 3000);
 //        }
             }
+        }else{
+            ((MainActivity)getActivity()).SendICENotification();
         }
-        ((MainActivity)getActivity()).SendICENotification();
-
     }
 
 

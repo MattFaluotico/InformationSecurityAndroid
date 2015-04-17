@@ -89,15 +89,18 @@ public class AddContactFragment extends Fragment implements View.OnClickListener
     public void onClick(View v) {
         String contact_num = String.valueOf(contact_id);
 
-        if (!TextUtils.isEmpty(name.getText().toString()) && (TextUtils.isEmpty(phone.getText().toString()) || TextUtils.isEmpty(email.getText().toString())) ) {
+        if ( !TextUtils.isEmpty(name.getText().toString()) && (TextUtils.isEmpty(phone.getText().toString()) || TextUtils.isEmpty(email.getText().toString())) ) {
 
-            Toast.makeText(this.getActivity(), "Please add contact's phone # and email", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this.getActivity(), "Please fill out all fields", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this.getActivity(), "Or clear all to clear this contact", Toast.LENGTH_LONG).show();
+            return;
 
         } else if(TextUtils.isEmpty(name.getText().toString()) && TextUtils.isEmpty(phone.getText().toString()) && TextUtils.isEmpty(email.getText().toString())){
+
             //clear contact by saving empty strings
-            prefs.edit().putString("name_"+contact_num, name.getText().toString()).putString("phone_"+contact_num, phone.getText().toString()).putString("email_"+contact_num, email.getText().toString()).apply();
-        }
-        else {
+            prefs.edit().putString("name_"+contact_num, "").putString("phone_"+contact_num, "").putString("email_"+contact_num, "").apply();
+
+        }else {
 
             //save contact to preferences
             prefs.edit().putString("name_"+contact_num, name.getText().toString()).putString("phone_"+contact_num, phone.getText().toString()).putString("email_"+contact_num, email.getText().toString()).apply();
@@ -114,10 +117,10 @@ public class AddContactFragment extends Fragment implements View.OnClickListener
             phone.setEnabled(false);
             email.setEnabled(false);
             save_btn.setEnabled(false);
-
-            //refresh listView
-            populate_listView();
         }
+
+        //refresh listView
+        populate_listView();
     }
 
     @Override
@@ -141,15 +144,13 @@ public class AddContactFragment extends Fragment implements View.OnClickListener
         phone.setText("");
         email.setText("");
 
-
         String contact_id = String.valueOf(position);
         //set text fields
-        String person = prefs.getString("name_"+contact_id, "");
-        if(!person.matches("")){
-            name.setText(person);
-            phone.setText(prefs.getString("phone_"+contact_id, ""));
-            email.setText(prefs.getString("email_"+contact_id, ""));
-        }
+//        if(!person.matches("")){
+        name.setText(prefs.getString("name_"+contact_id, ""));
+        phone.setText(prefs.getString("phone_"+contact_id, ""));
+        email.setText(prefs.getString("email_"+contact_id, ""));
+//        }
     }
 
 }

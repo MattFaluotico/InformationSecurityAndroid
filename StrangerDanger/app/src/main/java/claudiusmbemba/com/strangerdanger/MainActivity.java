@@ -24,6 +24,7 @@ import android.hardware.SensorManager;
 import android.location.GpsStatus;
 import android.location.Location;
 import android.location.LocationManager;
+import android.media.MediaPlayer;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
@@ -142,7 +143,7 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
     private Sensor senAccelerometer;
     private long lastUpdate = 0;
     private float last_x, last_y, last_z;
-    private static final int SHAKE_THRESHOLD = 5000;
+    private static final int SHAKE_THRESHOLD = 7000;
 
     //ACCELEROMETER RELATED METHODS
     @Override
@@ -267,6 +268,7 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
     private String rate;
     private String email;
     private String pass;
+    private MediaPlayer siren;
 
 
     private SharedPreferences prefs;
@@ -560,6 +562,8 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
 
         email = prefs.getString("emailAddress", "");
         pass = prefs.getString("emailPass", "");
+
+        siren = MediaPlayer.create(context, R.raw.siren);
 
         //ACCELEROMETER
         senSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
@@ -913,22 +917,66 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
         }
     }
 
+
+    public void sirenStart(){
+        siren.start();
+    }
+
+    public void sirenStop(){
+        siren.pause();
+    }
+
+    public MediaPlayer getSiren(){
+        return siren;
+    }
+
     public void notifyAttack() {
         String phone = prefs.getString("phone_0", "") +","+ prefs.getString("phone_1", "") +","+ prefs.getString("phone_2", "") +","+ prefs.getString("phone_3", "") +","+ prefs.getString("phone_4", "");
 
-        String geo ="http://maps.google.com/maps?daddr="+getLat()+","+getLng();
-        try {
-            String[] separated = phone.split(",");
-            for (String num : separated) {
-                smsManager.sendTextMessage(num, null, "HELP!!! I'm being attacked! Call 9-1-1.\n My location is \n "+ Uri.parse(geo)+ "\n -"+prefs.getString("UserName", "")+" \n\n- Sent from StrangerDanger App", null, null);
+        if(!prefs.getString("phone_0", "").matches("")) {
+            String geo = "http://maps.google.com/maps?daddr=" + getLat() + "," + getLng();
+            try {
+                String[] separated = phone.split(",");
+                for (String num : separated) {
+                    smsManager.sendTextMessage(num, null, "HELP!!! I'm being attacked! Call 9-1-1.\n My location is \n " + Uri.parse(geo) + "\n -" + prefs.getString("UserName", "") + " \n\n- Sent from StrangerDanger App", null, null);
+                }
+                Toast.makeText(context, "SMS Sent!",
+                        Toast.LENGTH_SHORT).show();
+            } catch (Exception e) {
+                Toast.makeText(context,
+                        "SMS failed, please try again later!",
+                        Toast.LENGTH_LONG).show();
+                e.printStackTrace();
             }
-            Toast.makeText(context, "SMS Sent!",
-                    Toast.LENGTH_SHORT).show();
-        } catch (Exception e) {
-            Toast.makeText(context,
-                    "SMS failed, please try again later!",
-                    Toast.LENGTH_LONG).show();
-            e.printStackTrace();
+
+        }else{
+
+            if(siren.isPlaying()) {
+                // Pause the music player
+                sirenStop();
+            }else {
+                sirenStart();
+            }
+
+            final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            String msg = "No Contacts To Send To...Will Siren instead";
+            builder.setMessage(msg)
+                    .setCancelable(false)
+                    .setPositiveButton("Stop", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            if(siren.isPlaying()) {
+                                // Pause the music player
+                                siren.pause();
+                                // If it's not playing
+                            }
+                            dialog.dismiss();
+                        }
+                    })
+                    .setTitle("Siren Alert");
+            final AlertDialog alert = builder.create();
+            alert.show();
+
         }
     }
 
@@ -960,6 +1008,7 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
                 notifySMS();
             }else{
                 Toast.makeText(this, "Please add First Contact", Toast.LENGTH_LONG).show();
+                Toast.makeText(this, "Don't wait until it's too late!", Toast.LENGTH_LONG).show();
             }
         }
         if(emailPref){
@@ -971,10 +1020,11 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
                 }
             }else{
                 Toast.makeText(this, "Please add First Contact", Toast.LENGTH_LONG).show();
+                Toast.makeText(this, "Don't wait until it's too late!", Toast.LENGTH_LONG).show();
             }
         }
         if(!smsPref && !emailPref){
-            Toast.makeText(this, "Enable Notification options in Preferences", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, "Enable ICE Notification Options (Preferences)", Toast.LENGTH_LONG).show();
         }
     }
 
