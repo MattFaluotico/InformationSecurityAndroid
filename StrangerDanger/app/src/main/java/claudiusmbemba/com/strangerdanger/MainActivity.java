@@ -141,7 +141,7 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
     private Sensor senAccelerometer;
     private long lastUpdate = 0;
     private float last_x, last_y, last_z;
-    private static final int SHAKE_THRESHOLD = 7000;
+    private static final int SHAKE_THRESHOLD = 2500;
 
     //ACCELEROMETER RELATED METHODS
     @Override
